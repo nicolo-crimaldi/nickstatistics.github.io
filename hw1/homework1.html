@@ -61,7 +61,95 @@
                 <li class="list-item"><b>Factorial design:</b> factorial experiments are used to draw conclusion about one or more factor or variable. It's called like this because every combination of factors is involved.</li>
             </li>
         </ul>
+        <h2>Applications</h2>
+        <div>
+            <p class="lead">Write a program in C# or VB.NET that creates a window containing a single line, point, circle, rectangle</p>
+            <code>
+                using System;
+                using System.Drawing;
+                using System.Windows.Forms;
+                 
+                public class ShapeForm : Form
+                {
+                    public ShapeForm()
+                    {
+                        this.Size = new Size(800, 800); // Increase the width to accommodate all shapes
+                    }
+                 
+                    protected override void OnPaint(PaintEventArgs e)
+                    {
+                        base.OnPaint(e);
+                        Graphics g = e.Graphics;
+                 
+                        // Draw a point
+                        int centerX = this.ClientSize.Width / 2;
+                        int centerY = 50;
+                        int r = 10;
+                        Pen pen = new Pen(Color.Aquamarine, 2);
+                        g.DrawEllipse(pen, centerX - r, centerY - r, 2 * r, 2 * r);
+                        pen.Dispose();
+                 
+                        // Draw a line
+                        Point point0 = new Point(100, 100);
+                        Point point1 = new Point(700, 100);
+                        pen = new Pen(Color.Aquamarine, 2);
+                        g.DrawLine(pen, point0, point1);
+                        pen.Dispose();
+                 
+                        // Draw a circle
+                        int x0 = this.ClientSize.Width / 2;
+                        int y0 = 250;
+                        int radius = 100;
+                        pen = new Pen(Color.Aquamarine, 2);
+                        g.DrawEllipse(pen, x0 - radius, y0 - radius, 2 * radius, 2 * radius);
+                        pen.Dispose();
+                 
+                        // Draw a rectangle
+                        int x = 100;
+                        int y = 400;
+                        int width = 600;
+                        int height = 100;
+                        pen = new Pen(Color.Aquamarine, 2);
+                        g.DrawRectangle(pen, x, y, width, height);
+                        pen.Dispose();
+                 
+                    }
+                }
+                 
+                public class Program
+                {
+                    public static void Main()
+                    {
+                        Application.Run(new ShapeForm());
+                    }
+                }
+            </code>
+        </div>
+        <div>
+            <p class="lead">
+                Write a program in JavaScript or TypeScript that creates a window containing a single line, point, circle, rectangle.
+            </p>
+            <code>
+                var canvas = document.getElementById("myCanvas");
+                var ctx = canvas.getContext("2d");
 
+                // Draw a line from (50, 50) to (200, 50)
+                ctx.beginPath();
+                ctx.moveTo(50, 50);
+                ctx.lineTo(200, 50);
+                ctx.stroke();
+
+                // Draw a circle with center at (150, 150) and radius 50
+                ctx.beginPath();
+                ctx.arc(150, 150, 50, 0, 2 * Math.PI);
+                ctx.stroke();
+
+                // Draw a rectangle at (50, 200) with width 200 and height 100
+                ctx.beginPath();
+                ctx.rect(50, 200, 200, 100);
+                ctx.stroke();
+            </code>
+        </div>
     </div>
 </body>
 </html>
