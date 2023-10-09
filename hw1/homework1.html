@@ -129,26 +129,29 @@
             <p class="lead">
                 Write a program in JavaScript or TypeScript that creates a window containing a single line, point, circle, rectangle.
             </p>
-            <code>
-                var canvas = document.getElementById("myCanvas");
-                var ctx = canvas.getContext("2d");
+            <pre>
+                <code>
+                    var canvas = document.getElementById("myCanvas");
+                    var ctx = canvas.getContext("2d");
 
-                // Draw a line from (50, 50) to (200, 50)
-                ctx.beginPath();
-                ctx.moveTo(50, 50);
-                ctx.lineTo(200, 50);
-                ctx.stroke();
+                    // Draw a line from (50, 50) to (200, 50)
+                    ctx.beginPath();
+                    ctx.moveTo(50, 50);
+                    ctx.lineTo(200, 50);
+                    ctx.stroke();
 
-                // Draw a circle with center at (150, 150) and radius 50
-                ctx.beginPath();
-                ctx.arc(150, 150, 50, 0, 2 * Math.PI);
-                ctx.stroke();
+                    // Draw a circle with center at (150, 150) and radius 50
+                    ctx.beginPath();
+                    ctx.arc(150, 150, 50, 0, 2 * Math.PI);
+                    ctx.stroke();
 
-                // Draw a rectangle at (50, 200) with width 200 and height 100
-                ctx.beginPath();
-                ctx.rect(50, 200, 200, 100);
-                ctx.stroke();
-            </code>
+                    // Draw a rectangle at (50, 200) with width 200 and height 100
+                    ctx.beginPath();
+                    ctx.rect(50, 200, 200, 100);
+                    ctx.stroke();
+                </code>
+            </pre>
+            
         </div>
     </div>
 </body>
