@@ -45,26 +45,24 @@
             </p>
     </div>
     <div>
+        <p>Upload the file you want to analize</p>
+        <input type="file" id="results" onchange="tsvParser(this)">
+    </div>
+    <div>
         <p>The results are:</p>
-        <div id="results" onload="tsvParser()">
-
+        <div id="results">
+            
         </div>
-        
     </div>
     <script>
-        function tsvParser(input = "https://raw.githubusercontent.com/ZioNick1/nickstatistics.github.io/main/datasets/Professional%20Life%20-%20Sheet1.tsv"){
+        function tsvParser(input){
             console.log("I'm in the script'");
-            const content = document.querySelector(".results");
-            const file = fetch(input).then(respone => {
-                if(!response.ok) throw new Error(response.status);
-                return response.text();
-            })
+            let file = input.files[0];
             let reader = new FileReader();
             reader.readAsText(file);
             reader.onload = ()=>{
                 console.log("i'm here");
                 console.log(reader.result);
-                document.getElementById(results).innerHTML = result;
             };
             reader.onerror = ()=>{
                 console.log(reader.error)
