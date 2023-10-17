@@ -46,27 +46,81 @@
     </div>
     <div>
         <p>Upload the file you want to analize</p>
-        <input type="file" id="results" onchange="tsvParser(this)">
+        <input type="file" id="results" onchange="tsvParser(this)" accept=".tsv">
     </div>
     <div>
         <p>The results are:</p>
         <div id="results">
-            
+
         </div>
     </div>
     <script>
-        function tsvParser(input){
-            console.log("I'm in the script'");
-            let file = input.files[0];
+        var matrix = [];
+        var numCols;
+        var numRows;
+        function tsvParser(input){ //we get the file to analyze and put the results in a matrix
+            let file = input.files[0];//here we store the content of the file
             let reader = new FileReader();
-            reader.readAsText(file);
+            reader.readAsText(file);//actually read the the content of the file as plain text
             reader.onload = ()=>{
-                console.log("i'm here");
-                console.log(reader.result);
+                const content = reader.result;
+                const rows = content.split('\n');
+                rows.forEach((row) => {
+                    const columns = row.split('\t')
+                    matrix.push(columns);//we push the results in a matrix which is an array made of arrays
+                });
+                evalFrequency();
             };
             reader.onerror = ()=>{
                 console.log(reader.error)
             };
+        }
+        function evalFrequency(){
+            //initializing objects to calculate absolute frequency
+            var ageFrequency = {};
+            var backgroundFrequency = {};
+            var heightFrequency = {};
+            //actual frequency calculation
+            matrix.forEach((column)=>{
+                for (let row = 0; row < matrix.length; row++) {//first for is for age frequency
+                    if(matrix[0][column] === "Age"){
+                        let age = matrix[row][column];
+                        ageFrequency += (age || 0) + 1;
+                    }
+                }
+                for (let row = 0; row < matrix.length; row++) {//second for is for height frequency
+                    if(matrix[0][column] === "Height"){
+                        let height = parseFloat(matrix[row][column]);
+                        heightFrequency += (height || 0) + 1;
+                    }
+                }
+                for (let row = 0; row < matrix.length; row++) {//third for is for background frequency
+                    if(matrix[0][column] === "Background (degree)"){
+                        let background = parseFloat(matrix[row][column]);
+                        backgroundFrequency += (background || 0) + 1;
+                    }
+                }
+            });
+            displayTable(ageFrequency, 'Age');
+            displayTable(backgroundFrequency, 'Background');
+            displayTable(heightFrequency, 'Height');
+        }
+        function displayTable(frequencies, variable) {
+            var table = '<h3>' + variable + '</h3>';
+            table += '<table>';
+            table += '<tr><th>Value</th><th>Absolute Frequency</th><th>Relative Frequency</th><th>Percentage</th></tr>';
+
+            var total = Object.values(frequencies).reduce((acc, val) => acc + val, 0);
+
+            Object.entries(frequencies).forEach(function ([key, value]) {
+                var relativeFrequency = value / total;
+                var percentage = (relativeFrequency * 100).toFixed(2) + '%';
+
+                table += '<tr><td>' + key + '</td><td>' + value + '</td><td>' + relativeFrequency.toFixed(2) + '</td><td>' + percentage + '</td></tr>';
+            });
+
+            table += '</table>';
+            document.body.innerHTML += table;
         }
     </script>
 </body>
