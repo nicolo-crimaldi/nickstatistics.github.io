@@ -49,8 +49,8 @@
         <input type="file" id="results" onchange="tsvParser(this)" accept=".tsv">
     </div>
     <div>
-        <p>The results are:</p>
-        <div id="results">
+        <p>The joint distribution will be:</p>
+        <div id="results" onload="tsvParser(this)">
 
         </div>
     </div>
@@ -70,6 +70,7 @@
                     matrix.push(columns);//we push the results in a matrix which is an array made of arrays
                 });
                 evalFrequency();
+                calculateFrequencies();
             };
             reader.onerror = ()=>{
                 console.log(reader.error)
@@ -121,6 +122,31 @@
 
             table += '</table>';
             document.body.innerHTML += table;
+        }
+        function calculateFrequencies(input = matrix) {
+            // Initialize objects for frequencies
+            var combinedFrequency = {};
+
+            // Calculate frequencies for combined
+            input.forEach(function (row) {
+                var combined = row.join(' - ');
+                combinedFrequency[combined] = (combinedFrequency[combined] || 0) + 1;
+            });
+
+            // Display the results in a table
+            displayTableJ(combinedFrequency, 'Combined (Background - Age)');
+        }
+        function displayTableJ(frequencies, variable) {
+            var table = '<h3>' + variable + '</h3>';
+            table += '<table>';
+            table += '<tr><th>Value</th><th>Frequency</th></tr>';
+
+            Object.entries(frequencies).forEach(function ([key, value]) {
+                table += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
+            });
+
+            table += '</table>';
+            document.getElementById('resultTables').innerHTML = table;
         }
     </script>
 </body>
