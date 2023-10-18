@@ -4,7 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Frequency Analizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
   </head>
 <body>
     <div>
@@ -45,112 +48,127 @@
             </p>
     </div>
     <div>
-        <p>Upload the file you want to analize</p>
-        <input type="file" id="results" onchange="tsvParser(this)" accept=".tsv">
+        <form>
+            <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Insert first variable</label>
+              <input type="text" class="form-control" id="exampleInputEmail1">
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">Insert second variable</label>
+              <input type="text" class="form-control" id="exampleInputPassword1">
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputPassword1" class="form-label">Insert third variable</label>
+                <input type="text" class="form-control" id="exampleInputVariable1">
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="exampleCheck1">
+              <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="file" class="form-check-input" id="uploadButton">
+            </div>
+            <button type="submit" class="btn btn-primary" onclick="tsvParser(uploadButton)">Submit</button>
+        </form>
+
     </div>
-    <div>
-        <p>The joint distribution will be:</p>
-        <div id="results" onload="tsvParser(this)">
-
-        </div>
-
-        <div>
+    
             <p>Code</p>
             <pre>
                 <code>
                     var matrix = [];
-        var numCols;
-        var numRows;
-        function tsvParser(input){ //we get the file to analyze and put the results in a matrix
-            let file = input.files[0];//here we store the content of the file
-            let reader = new FileReader();
-            reader.readAsText(file);//actually read the the content of the file as plain text
-            reader.onload = ()=>{
-                const content = reader.result;
-                const rows = content.split('\n');
-                rows.forEach((row) => {
-                    const columns = row.split('\t')
-                    matrix.push(columns);//we push the results in a matrix which is an array made of arrays
-                });
-                evalFrequency();
-                calculateFrequencies();
-            };
-            reader.onerror = ()=>{
-                console.log(reader.error)
-            };
-        }
-        function evalFrequency(){
-            //initializing objects to calculate absolute frequency
-            var ageFrequency = {};
-            var backgroundFrequency = {};
-            var heightFrequency = {};
-            //actual frequency calculation
-            matrix.forEach((column)=>{
-                for (let row = 0; row < matrix.length; row++) {//first for is for age frequency
-                    if(matrix[0][column] === "Age"){
-                        let age = matrix[row][column];
-                        ageFrequency += (age || 0) + 1;
+                    var numCols;
+                    var numRows;
+                    function tsvParser(input){ //we get the file to analyze and put the results in a matrix
+                        let file = input.files[0];//here we store the content of the file
+                        let reader = new FileReader();
+                        reader.readAsText(file);//actually read the the content of the file as plain text
+                        reader.onload = ()=>{
+                            const content = reader.result;
+                            const rows = content.split('\n');
+                            rows.forEach((row) => {
+                                const columns = row.split('\t')
+                                matrix.push(columns);//we push the results in a matrix which is an array made of arrays
+                            });
+                            evalFrequency();
+                            calculateFrequencies();
+                        };
+                        reader.onerror = ()=>{
+                            console.log(reader.error)
+                        };
                     }
-                }
-                for (let row = 0; row < matrix.length; row++) {//second for is for height frequency
-                    if(matrix[0][column] === "Height"){
-                        let height = parseFloat(matrix[row][column]);
-                        heightFrequency += (height || 0) + 1;
+                    function evalFrequency(){
+                        //initializing objects to calculate absolute frequency
+                        var ageFrequency = {};
+                        var backgroundFrequency = {};
+                        var heightFrequency = {};
+                        //actual frequency calculation
+                        matrix.forEach((column)=>{
+                            for (let row = 0; row < matrix.length; row++) {//first for is for age frequency
+                                if(matrix[0][column] === document.querySelector(exampleInputEmail1).value){
+                                    let age = matrix[row][column];
+                                    ageFrequency += (age || 0) + 1;
+                                }
+                            }
+                            for (let row = 0; row < matrix.length; row++) {//second for is for height frequency
+                                if(matrix[0][column] === document.querySelector(exampleInputPassword1).value){
+                                    let height = parseFloat(matrix[row][column]);
+                                    heightFrequency += (height || 0) + 1;
+                                }
+                            }
+                            for (let row = 0; row < matrix.length; row++) {//third for is for background frequency
+                                if(matrix[0][column] === document.querySelector(exampleInputVariable1).value){
+                                    let background = parseFloat(matrix[row][column]);
+                                    backgroundFrequency += (background || 0) + 1;
+                                }
+                            }
+                        });
+                        displayTable(ageFrequency, document.querySelector(exampleInputEmail1));
+                        displayTable(backgroundFrequency, document.querySelector(exampleInputPassword1));
+                        displayTable(heightFrequency, document.querySelector(exampleInputVariable1).value);
                     }
-                }
-                for (let row = 0; row < matrix.length; row++) {//third for is for background frequency
-                    if(matrix[0][column] === "Background (degree)"){
-                        let background = parseFloat(matrix[row][column]);
-                        backgroundFrequency += (background || 0) + 1;
+                    function displayTable(frequencies, variable) {
+                        var table = '<h3>' + variable + '</h3>';
+                        table += '<table>';
+                        table += '<tr><th>Value</th><th>Absolute Frequency</th><th>Relative Frequency</th><th>Percentage</th></tr>';
+            
+                        var total = Object.values(frequencies).reduce((acc, val) => acc + val, 0);
+            
+                        Object.entries(frequencies).forEach(function ([key, value]) {
+                            var relativeFrequency = value / total;
+                            var percentage = (relativeFrequency * 100).toFixed(2) + '%';
+            
+                            table += '<tr><td>' + key + '</td><td>' + value + '</td><td>' + relativeFrequency.toFixed(2) + '</td><td>' + percentage + '</td></tr>';
+                        });
+            
+                        table += '</table>';
+                        document.body.innerHTML += table;
                     }
-                }
-            });
-            displayTable(ageFrequency, 'Age');
-            displayTable(backgroundFrequency, 'Background');
-            displayTable(heightFrequency, 'Height');
-        }
-        function displayTable(frequencies, variable) {
-            var table = '<h3>' + variable + '</h3>';
-            table += '<table>';
-            table += '<tr><th>Value</th><th>Absolute Frequency</th><th>Relative Frequency</th><th>Percentage</th></tr>';
-
-            var total = Object.values(frequencies).reduce((acc, val) => acc + val, 0);
-
-            Object.entries(frequencies).forEach(function ([key, value]) {
-                var relativeFrequency = value / total;
-                var percentage = (relativeFrequency * 100).toFixed(2) + '%';
-
-                table += '<tr><td>' + key + '</td><td>' + value + '</td><td>' + relativeFrequency.toFixed(2) + '</td><td>' + percentage + '</td></tr>';
-            });
-
-            table += '</table>';
-            document.body.innerHTML += table;
-        }
-        function calculateFrequencies(input = matrix) {
-            // Initialize objects for frequencies
-            var combinedFrequency = {};
-
-            // Calculate frequencies for combined
-            input.forEach(function (row) {
-                var combined = row.join(' - ');
-                combinedFrequency[combined] = (combinedFrequency[combined] || 0) + 1;
-            });
-
-            // Display the results in a table
-            displayTableJ(combinedFrequency, 'Combined (Background - Age)');
-        }
-        function displayTableJ(frequencies, variable) {
-            var table = '<h3>' + variable + '</h3>';
-            table += '<table>';
-            table += '<tr><th>Value</th><th>Frequency</th></tr>';
-
-            Object.entries(frequencies).forEach(function ([key, value]) {
-                table += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
-            });
-
-            table += '</table>';
-            document.getElementById('resultTables').innerHTML = table;
-        }
+                    function calculateFrequencies(input = matrix) {
+                        // Initialize objects for frequencies
+                        var combinedFrequency = {};
+            
+                        // Calculate frequencies for combined
+                        input.forEach(function (row) {
+                            var combined = row.join(' - ');
+                            combinedFrequency[combined] = (combinedFrequency[combined] || 0) + 1;
+                        });
+            
+                        // Display the results in a table
+                        displayTableJ(combinedFrequency, 'Combined (Background - Age)');
+                    }
+                    function displayTableJ(frequencies, variable) {
+                        var table = '<h3>' + variable + '</h3>';
+                        table += '<table>';
+                        table += '<tr><th>Value</th><th>Frequency</th></tr>';
+            
+                        Object.entries(frequencies).forEach(function ([key, value]) {
+                            table += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
+                        });
+            
+                        table += '</table>';
+                        document.getElementById('resultTables').innerHTML = table;
+                    }
                 </code>
             </pre>
             <p>In c#:</p>
@@ -843,27 +861,27 @@ class Program
             //actual frequency calculation
             matrix.forEach((column)=>{
                 for (let row = 0; row < matrix.length; row++) {//first for is for age frequency
-                    if(matrix[0][column] === "Age"){
+                    if(matrix[0][column] === document.querySelector(exampleInputEmail1).value){
                         let age = matrix[row][column];
                         ageFrequency += (age || 0) + 1;
                     }
                 }
                 for (let row = 0; row < matrix.length; row++) {//second for is for height frequency
-                    if(matrix[0][column] === "Height"){
+                    if(matrix[0][column] === document.querySelector(exampleInputPassword1).value){
                         let height = parseFloat(matrix[row][column]);
                         heightFrequency += (height || 0) + 1;
                     }
                 }
                 for (let row = 0; row < matrix.length; row++) {//third for is for background frequency
-                    if(matrix[0][column] === "Background (degree)"){
+                    if(matrix[0][column] === document.querySelector(exampleInputVariable1).value){
                         let background = parseFloat(matrix[row][column]);
                         backgroundFrequency += (background || 0) + 1;
                     }
                 }
             });
-            displayTable(ageFrequency, 'Age');
-            displayTable(backgroundFrequency, 'Background');
-            displayTable(heightFrequency, 'Height');
+            displayTable(ageFrequency, document.querySelector(exampleInputEmail1));
+            displayTable(backgroundFrequency, document.querySelector(exampleInputPassword1));
+            displayTable(heightFrequency, document.querySelector(exampleInputVariable1).value);
         }
         function displayTable(frequencies, variable) {
             var table = '<h3>' + variable + '</h3>';
