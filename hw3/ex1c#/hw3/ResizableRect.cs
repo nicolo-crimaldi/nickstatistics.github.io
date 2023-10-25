@@ -14,6 +14,8 @@ public class ResizableRect
     private Color rectColor;
     private Random random;
     private Bitmap canvas;
+    private float zoomFactor = 1.0f;
+
 
     public ResizableRect(Rectangle rect, Color color, Bitmap canvas)
     {
@@ -36,6 +38,10 @@ public class ResizableRect
 
     public void Draw(Graphics graphics)
     {
+        using (SolidBrush backgroundBrush = new SolidBrush(Color.White)) // Imposta il colore di sfondo (in questo caso bianco)
+        {
+            graphics.FillRectangle(backgroundBrush, rectangle); // Riempie il rettangolo con il colore di sfondo
+        }
         using (Pen pen = new Pen(rectColor, 2))
         {
             graphics.DrawRectangle(pen, rectangle);

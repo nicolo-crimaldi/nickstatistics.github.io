@@ -1,10 +1,8 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Homework 3, Exercise 1</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hw pt. attack</title>
     <style>
         #grafico {
             width: 400px;
@@ -12,132 +10,202 @@
             border: 1px solid #000;
         }
     </style>
-  </head>
-  <body>
-    <p class="h1">Exercise 1</p>
-    <p class="h4">Part a</p>
-    <div id="exerciseTextDiv">
-        <p class="lead">
-            M systems are subject to a series of N attacks. On the x-axis, we indicate the attacks and on the Y-axis we
-            simulate the accumulation of a "security score" (-1, 1), where the score is -1 if the system is penetrated
-            and 1 if the system was successfully "shielded" or protected. Simulate the score "trajectories" for all systems,
-            assuming, for simplicity, a constant penetration probability p at each attack. 
+    <link href="rectCss.css" rel="stylesheet"/>
+</head>
+
+<body>
+    <div class="container">
+        <canvas id="grafico" width="400" height="200">></canvas>
+    </div>
+    <div>
+        <label for="numeroAttacchi">Inserisci il numero di attacchi:</label>
+        <input type="number" id="numeroAttacchi" min="1">
+        <label for="numeroAttacchi">Inserisci il numero di macchine:</label>
+        <input type="number" id="numeroMacchine" min="1">
+        <button onclick="avviaAnimazione()">Avvia Animazione</button>
+    </div>
+    <div class="container">
+        <h4>Recall briefly the definition and math notions relevant to "probability space" and make some simple examples, indicating among the triple of the space the meaning of each element in your particular example.
+        </h4>
+
+        <p>
+            A probability space, also known as a probability triple, is a fundamental concept in probability theory. It consists of three main components:
+            <ul>
+                <li>
+                    Sample Space (&Omega;): The sample space is the set of all possible outcomes of a random experiment or process. It represents all possible scenarios or events that can occur. It is denoted by the symbol &Omega;.
+                </li>
+                <li>
+                    Event Space (F): The event space, also called the sigma-algebra or the set of events, is a collection of subsets of the sample space Ω. These subsets represent events that can occur. The event space F must satisfy certain properties, such as being closed under complementation and countable unions.
+                </li>
+                <li>
+                    Probability Measure (P): The probability measure is a function P that assigns a real number between 0 and 1 to each event in the event space. It quantifies the likelihood of each event occurring, with the total probability of all events in the sample space summing to 1. Mathematically, P satisfies:
+                    <ul>
+                        <li>
+                            P(&Omega;) = 1 (the probability of the entire sample space is 1).
+                        </li>
+                        <li>
+                            For any event A in the event space, 0 ≤ P(A) ≤ 1.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </p>
+
+        <p>
+            Here are some examples of probability spaces:
+            <ul>
+                <li>
+                    <p>Coin Toss Example</p>
+    <ul>
+        <li><strong>Sample Space (Ω):</strong> {Heads (H), Tails (T)}</li>
+        <li><strong>Event Space (F):</strong> {{}, {H}, {T}, {H, T}}</li>
+        <li><strong>Probability Measure (P):</strong></li>
+        <ul>
+            <li>P({H}) = P({T}) = 0.5</li>
+            <li>P({H, T}) = 1</li>
+            <li>P({}) = 0</li>
+        </ul>
+    </ul>
+
+    <p>Rolling a Six-sided Die Example</p>
+    <ul>
+        <li><strong>Sample Space (Ω):</strong> {1, 2, 3, 4, 5, 6}</li>
+        <li><strong>Event Space (F):</strong> All possible subsets of Ω</li>
+        <li><strong>Probability Measure (P):</strong></li>
+        <ul>
+            <li>P({1}) = P({2}) = ... = P({6}) = 1/6 for each individual outcome</li>
+        </ul>
+    </ul>
+
+    <p>Deck of Cards Example</p>
+    <ul>
+        <li><strong>Sample Space (Ω):</strong> The set of all 52 playing cards in a standard deck</li>
+        <li><strong>Event Space (F):</strong> Various subsets representing different card combinations or events</li>
+        <li><strong>Probability Measure (P):</strong> The probability of drawing a specific card depends on the size of the event divided by the size of the sample space</li>
+    </ul>
+                </li>
+            </ul>
         </p>
     </div>
-    <div id="exerciseResolutionDiv">
-          <div id="trajectories">
-            <canvas id="grafico"></canvas>
+    <script>
+        // Ottieni il riferimento al canvas HTML
+        var canvas = document.getElementById('grafico');
+        var ctx = canvas.getContext('2d'); //get canvas context
 
-                <script>
-                    // Ottieni il riferimento al canvas HTML
-                    var canvas = document.getElementById('grafico');
-                    var ctx = canvas.getContext('2d'); //get canvas context
+        // Imposta le dimensioni del canvas
+        canvas.width = 1000;
+        canvas.height = 1000;
 
-                    // Imposta le dimensioni del canvas
-                    canvas.width = 1000;
-                    canvas.height = 1000;
+        // Imposta l'origine degli assi
+        var originX = 500;
+        var originY = 500;
 
-                    // Imposta l'origine degli assi
-                    var originX = 500;
-                    var originY = 500;
+        function getRandomColor() {
+            // Genera valori casuali per i canali R, G e B
+            var r = Math.floor(Math.random() * 256); // Valore tra 0 e 255
+            var g = Math.floor(Math.random() * 256);
+            var b = Math.floor(Math.random() * 256);
+        
+            // Componi il colore in formato "rgb(r, g, b)"
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }        
 
-                    // Chiedi all'utente di inserire un numero finito N tra 1 e 10
-                    // Chiedi all'utente di inserire un numero finito N tra 1 e 10
-                    var N = prompt("Inserisci il numero di attacchi da effettuare (> 0):");
-                    N = parseInt(N);
+    function avviaAnimazione(){
+        // Chiedi all'utente di inserire il numero di attacchi
+        var N = document.getElementById('numeroAttacchi').value;
+        N = parseInt(N);
+        var M = document.getElementById('numeroMacchine').value;
+        M = parseInt(M);
 
-                    var M = prompt("Inserisci il numero di macchine (> 0):");
-                    M = parseInt(M);
+        if (N < 1 || M < 1) {
+            alert("I numeri devono essere > 1");
+        } else {
+            // Disegna gli assi cartesiani con numeri
+            ctx.beginPath();
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, canvas.height);
+            ctx.moveTo(0, originY);
+            ctx.lineTo(canvas.width, originY);
 
+            // Numeri sugli assi X e Y
+            for (var i = 1; i <= N * M; i++) {
+                var xValue = i * 20;
+                var yValue = i * 20;
+                ctx.fillText(i, originX + xValue, originY + 12);
+                ctx.fillText(i, originX - 16, originY - yValue + 6);
+            }
+            ctx.stroke();
 
-                    if (N < 1 || M < 1) {
-                        alert("I numeri devono essere > 1");
-                    } else {
-                        // Disegna gli assi cartesiani con numeri
-                        ctx.beginPath();
-                        ctx.moveTo(originX, 0);
-                        ctx.lineTo(originX, canvas.height);
-                        ctx.moveTo(0, originY);
-                        ctx.lineTo(canvas.width, originY);
+            // Inizializza le coordinate
+            var x = 0;
+            // y viene resettata prima di disegnare ogni segmento del grafico
 
-                        // Numeri sugli assi X e Y
-                        for (var i = 1; i <= N * M; i++) {
-                            var xValue = i * 20;
-                            var yValue = i * 20;
-                            ctx.fillText(i, originX + xValue, originY + 12);
-                            ctx.fillText(i, originX - 16, originY - yValue + 6);
+            var res = [];  // Per tenere traccia del valore cumulativo della y di ogni macchina dopo ogni attacco 
+            var xEnd = []; // Per tenere traccia dell'ultimo estremo destro della coordinata X di ciascuna macchina
+            var yEnd = []; // Per tenere traccia dell'ultimo estremo destro della coordinata Y di ciascuna macchina
+
+            for (var i = 0; i < M; i++) {
+                res[i] = 0; // Inizializza i valori delle rette per ciascuna macchina
+                xEnd[i] = 0; // Inizializza l'estremo destro X
+                yEnd[i] = 0; // Inizializza l'estremo destro Y
+            }
+            var j = N; // controlla che la funzione animateLine venga eseguita N volte
+            var k = N; // controlla che la funzione Attacco venga eseguita N volte
+
+            // Funzione per animare la retta
+            function animateLine() {
+                if (j > 0) {
+                    x += 1;
+                    for (var i = 0; i < M; i++) {
+                        var y = 0; // resetta la y
+
+                        if (xEnd[i] == 0) {
+                            ctx.beginPath();
+                            ctx.moveTo(originX, originY);
                         }
+
+                        // individua la posizione dell'estremo destro della retta relativa alla macchina corrente
+                        ctx.moveTo(originX + xEnd[i] * 20, originY - yEnd[i] * 20);
+
+                        y += res[i]; // recupera la y precedente
+                        xEnd[i] = x; // Aggiorna l'estremo destro X
+                        yEnd[i] = y; // Aggiorna l'estremo destro Y
+
+                        // individua il punto da segnare sul grafico su canvas
+                        var canvasX = originX + xEnd[i] * 20;
+                        var canvasY = originY - yEnd[i] * 20;
+
+                        // traccia la linea dalla posizione attuale a quella finale
+                        ctx.lineTo(canvasX, canvasY);
+                         ctx.strokeStyle ="blue";
+                        // FUNZIONE PER GENERARE COLORE RANDOM
+                        // ctx.strokeStyle = getRandomColor();
                         ctx.stroke();
-
-                        // Inizializza le coordinate
-                        var x = 0;
-                        // y viene resettata prima di disegnare ogni segmento del grafico
-
-                        var res = [];  // Per tenere traccia del valore cumulativo della y di ogni macchina dopo ogni attacco 
-                        var xEnd = []; // Per tenere traccia dell'ultimo estremo destro della coordinata X di ciascuna macchina
-                        var yEnd = []; // Per tenere traccia dell'ultimo estremo destro della coordinata Y di ciascuna macchina
-
-                        for (var i = 0; i < M; i++) {
-                            res[i] = 0; // Inizializza i valori delle rette per ciascuna macchina
-                            xEnd[i] = 0; // Inizializza l'estremo destro X
-                            yEnd[i] = 0; // Inizializza l'estremo destro Y
-                        }
-                        var j = N; // controlla che la funzione animateLine venga eseguita N volte
-                        var k = N; // controlla che la funzione Attacco venga eseguita N volte
-
-                        // Funzione per animare la retta
-                        function animateLine() {
-                        if (j > 0) {
-                            x += 1;
-                            for (var i = 0; i < M; i++) {
-                                var y = 0; // resetta la y
-
-                                if (xEnd[i] == 0) {
-                                    ctx.beginPath();
-                                    ctx.moveTo(originX, originY);
-                                }
-                                // individua la posizione dell'estremo destro della retta relativa alla macchina corrente
-                                ctx.moveTo(originX + xEnd[i] * 20, originY - yEnd[i] * 20);
-
-                                y += res[i]; // recupera la y precedente
-                                xEnd[i] = x; // Aggiorna l'estremo destro X
-                                yEnd[i] = y; // Aggiorna l'estremo destro Y
-
-                                // individua il punto da segnare sul grafico su canvas
-                                var canvasX = originX + xEnd[i] * 20;
-                                var canvasY = originY - yEnd[i] * 20;
-
-                                // traccia la linea dalla posizione attuale a quella finale
-                                ctx.lineTo(canvasX, canvasY);
-                                ctx.strokeStyle = "blue";
-                                ctx.stroke();
-                            }
-                            j--;
-                        }
                     }
-
-                    // Funzione per aggiornare i valori delle rette
-                    function Attacco() {
-                        if (k > 0) {
-                            for (var i = 0; i < M; i++) {
-                                if (Math.random() > 0.5) {
-                                    res[i] += -1;
-                                } else {
-                                    res[i] += 1;
-                                }
-                            }
-                        }
-                        k--;
-                    }
-
-                    setInterval(Attacco, 1000); // Ogni 1000 millisecondi (1 secondo)
-                    setInterval(animateLine, 1000); // Ogni 1000 millisecondi (1 secondo)
+                    j--;
                 }
-                </script>
-          </div>
-    </div>
+            }
 
+            // Funzione per aggiornare i valori delle rette
+            function Attacco() {
+                if (k > 0) {
+                    for (var i = 0; i < M; i++) {
+                        if (Math.random() > 0.5) {
+                            res[i] += -1;
+                        } else {
+                            res[i] += 1;
+                        }
+                    }
+                }
+                k--;
+            }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-  </body>
+            setInterval(Attacco, 1000); // Ogni 1000 millisecondi (1 secondo)
+            setInterval(animateLine, 1000); // Ogni 1000 millisecondi (1 secondo)
+        }
+    }
+    </script>
+    <script src="rectScript.js"></script>
+</body>
+
 </html>
