@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Frequency Analizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+  </head>
+<body>
+    <div>
+        <p class="h1">Question 1</p>
+        <p class="h4">1.
+            Choose 3 variables from our surveys
+            <ul>
+                <li class="list-item">
+                    one Qualitative
+                </li>
+                <li class="list-item">
+                    one Quantitative discrete
+                </li>
+                <li class="list-item">
+                    one Quantitative continuous
+                </li>
+            </ul>
+            create the most efficient algorithms to compute the frequency (absolute/relative/percentage) distribution of:
+            <ul>
+                <li class="list-item">
+                    the 3 variables
+                </li>
+                <li class="list-item">
+                    the joint distribution of 2 variables (use a general logic, where variables could be any number).
+                </li>
+            </ul>
+            Double check/compare the results using some DBMS functionalities you prefer (eg., access, oracle online, postgres, ...)
+            </p>
+
+            <p class="h1">Solution 1</p>
+            <p>I chose the survey about <a href="https://github.com/ZioNick1/nickstatistics.github.io/blob/main/datasets/Professional%20Life%20-%20Sheet1.tsv" target="_blank">professional life</a></p>
+    </div>
+    <div>
+        <script>
+            function loadTSV(callback){//make the http request to get the file
+                const url = "https://raw.githubusercontent.com/ZioNick1/nickstatistics.github.io/main/datasets/Professional%20Life%20-%20Sheet1.tsv";
+                const http = new XMLHttpRequest();
+                http.open("GET", url, true);
+                http.send();
+                console.log('sent');
+                http.responseType = "text";
+                http.onload = () => {
+                    if(http.readyState === 4 && http.status === 200){
+                        const data = http.response;
+                        console.log(data);
+                        callback(data);
+                    } else{
+                        console.log(http.status);
+                    }
+                } 
+                
+            }
+
+            function readTSV(callback){//actual parsing the file to an array of arrays
+                loadTSV((data) => {
+                    let matrix = [];
+                    const rows = data.split('\n');
+                    rows.forEach((row) => {
+                        const columns = row.split('\t');
+                        matrix.push(columns);
+                    });
+                    callback(matrix);
+                })
+            } 
+
+            function addToSelect(){//adding to the form the multiple variable
+                readTSV((completeMatrix) => {
+                    let header = completeMatrix[0];
+                    let sel = document.getElementById("var");
+                    for (let i = 0; i < header.length; i++) {
+                        let option = document.createElement("option");
+                        option.value = header[i];
+                        option.text = header[i];
+                        sel.appendChild(option)
+                        
+                    }
+                });
+                
+            }
+            document.addEventListener("DOMContentLoaded", addToSelect());
+
+            function load(){
+                let sel = document.getElementById("var");
+                sel.onload = addToSelect();
+            }
+
+            var selectedVariable = [];
+
+            document.addEventListener("click", ()=>{
+                const button = document.getElementById("addVariable");
+                const sel = document.getElementById("var");
+                const errorPar = document.createElement("p");
+                errorPar.id = "errorPar";
+                errorPar.innerText = "You already selected this variable";
+                errorPar.hidden = true;
+                const answerDiv = document.getElementById("variableDiv");
+                answerDiv.appendChild(errorPar);
+                console.log('inside the event');
+                button.onclick=()=>{
+                    const table = document.getElementById("variableSelected");
+                    const entry = document.createElement("li");
+                    if (selectedVariable.includes(sel.value)) {
+                        const innerErrorPar = document.getElementById("errorPar");
+                        innerErrorPar.hidden = false;
+                        console.log(errorPar.hidden);
+                    } else {
+                        selectedVariable.push(sel.value);
+                        entry.innerText = selectedVariable[selectedVariable.length - 1];
+                        table.appendChild(entry);
+                        console.log(errorPar.hidden);
+                        const innerErrorPar = document.getElementById("errorPar");
+                        innerErrorPar.hidden = true;
+                    }
+                        
+                }
+            });
+            
+
+
+        </script>
+        <form>
+            <label for="variables">Choose a variable</label>
+            <select name="variables" id="var" onload="addToSelect"></select>
+            <button type="button" id="addVariable" onclick="click()">Add to variables to calculate the frequency</button>
+            <button type="button" id="evalButton">Calculate frequencies</button>
+            <div id="variableDiv">
+                <p>You selected the following variables:</p>
+                <ul id="variableSelected">
+
+                </ul>
+            </div>
+        </form>
+        
+
+    </div>
+    
+            <p>Code</p>
+            <pre>
+                <code>
+                    
+                </code>
+            </pre>
+            <p>In c#:</p>
+            <pre>
+                <code>
+                    
+using System;
+using System.Windows.Forms;
+using System.IO;
+using System.Data;
+using System.Linq;
+
+class Program
+{
+    static Label resultsLabel; // Declare the resultsLabel outside of Main method
+
+    class Program
+    {
+        static Label resultsLabel; // Declare the resultsLabel outside of Main method
+
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            // Create a new form
+            Form form = new Form
+            {
+                Text = "Frequency Calculator",
+                Size = new System.Drawing.Size(400, 400)
+            };
+
+            // Create a label on the form
+            Label label = new Label
+            {
+                Text = "Frequency Calculator",
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            // Add the label to the form
+            form.Controls.Add(label);
+
+            // Show the form (this shows the form, but it won't block the program)
+            form.Show();
+
+            // Read the Excel file
+            string filePath = "C:/Users/pietr/OneDrive/Documenti/GitHub/Statistics/hw2_CS/professional_life.xlsx";
+            DataSet ds = new DataSet();
+            if (File.Exists(filePath))
+            {
+                ds.ReadXml(filePath);
+            }
+            else
+            {
+                MessageBox.Show("File not found!");
+                return;
+            }
+
+            // Get the data from the Excel file
+            DataTable dt = ds.Tables[0];
+            var sex = dt.AsEnumerable().Select(x => x.Field("Sex")).ToList();
+            var teamLeaderOrPlayer = dt.AsEnumerable().Select(x => x.Field("Team leader or Team player ?")).ToList();
+
+            // Compute the joint probability
+            var jointProbability = sex.Zip(teamLeaderOrPlayer, (s, t) => new { Sex = s, TeamLeaderOrPlayer = t })
+                                       .GroupBy(x => new { x.Sex, x.TeamLeaderOrPlayer })
+                                       .ToDictionary(x => $"{x.Key.Sex} - {x.Key.TeamLeaderOrPlayer}", x => (double)x.Count() / dt.Rows.Count);
+
+            // Display the results in a label on the form
+            resultsLabel = new Label
+            {
+                Text = "Calculating frequencies...",
+                TextAlign = ContentAlignment.TopLeft,
+                Location = new System.Drawing.Point(10, 50),
+                AutoSize = true
+            };
+            form.Controls.Add(resultsLabel);
+
+            string message = "Joint probability between Sex and Team leader or Team player ?:\n";
+            foreach (var item in jointProbability)
+            {
+                message += $"{item.Key}: {item.Value:P2}\n";
+            }
+
+            resultsLabel.Text = message; // Update the label text with the results
+
+            // Wait for the form to be closed
+            Application.Run(form);
+        }
+    }
+}
+    
+                </code>
+            </pre>
+        </div>
+    </div>
+    <div>
+        <p class="h4"> For the following most important data structures (or others that you may want to suggest) find out how to:
+
+            -loop (break/continue)
+            -add/remove/get/set/check the existence of key/value
+            
+            data structures:
+            array, list, dictionary, sorted list, hashset, sortedset, queue, stack, linkedlist (or any other structure you think to be useful)
+            
+            Note in a very concise way your finding in your Js Cheatsheet, and, in case a corresponding Js object does not exists, create a simple equivalent class with all necessary corresponding methods.
+                </p>
+        <pre>
+            <code>
+                // Loops: break and continue 
+            for (let i = 0; i < 10; i++) {
+                if (i == 5) {
+                    break;  // interrupts execution of the loop
+                }
+                console.log(i);
+            }
+
+            for (let i = 0; i < 10; i++) {
+                if (i == 5) {
+                    continue;  // skips the current iteration of the loop
+                }
+                console.log(i);
+            }
+
+            // For each DS, show how to create, add, remove, and iterate over it
+            // Array (equivalent to a list)
+            let arr = [1, 2, 3, 4, 5];
+            arr.push(6);
+            arr.pop();
+            for (let i = 0; i < arr.length; i++) {
+                console.log(arr[i]);
+            }
+            // Object (behaves similarly to a dictionary)
+            let obj = {
+                name: "John",
+                age: 30,
+                city: "New York"
+            };
+            obj["job"] = "Programmer";
+            delete obj.city;
+            for (let key in obj) {
+                console.log(obj[key]);
+            }
+            // Set
+            let set = new Set();
+            set.add(1);
+            set.add(2);
+            set.add(3);
+            set.add(4);
+            set.add(5);
+            set.add(6);
+            set.delete(6);
+            for (let item of set) {
+                console.log(item);
+            }
+            // Map
+            let map = new Map();
+            map.set("name", "John");
+            map.set("age", 30);
+            map.set("city", "New York");
+            map.set("job", "Programmer");
+            map.delete("city");
+            for (let [key, value] of map) {
+                console.log(value);
+            }
+            // Stack
+            let stack = [];
+            stack.push(1);
+            stack.push(2);
+            stack.push(3);
+            stack.push(4);
+            stack.push(5);
+            stack.push(6);
+            stack.pop();
+            for (let i = stack.length - 1; i >= 0; i--) {
+                console.log(stack[i]);
+            }
+            // Queue
+            let queue = [];
+            queue.push(1);
+            queue.push(2);
+            queue.push(3);
+            queue.push(4);
+            queue.push(5);
+            queue.push(6);
+            queue.shift();
+            for (let i = 0; i < queue.length; i++) {
+                console.log(queue[i]);
+            }
+            // Linked List
+            class Node {
+                constructor(data) {
+                    this.data = data;
+                    this.next = null;
+                }
+            }
+            class LinkedList {
+                constructor() {
+                    this.head = null;
+                    this.size = 0;
+                }
+                add(data) {
+                    let node = new Node(data);
+                    let current;
+                    if (this.head == null) {
+                        this.head = node;
+                    } else {
+                        current = this.head;
+                        while (current.next) {
+                            current = current.next;
+                        }
+                        current.next = node;
+                    }
+                    this.size++;
+                }
+                remove(data) {
+                    let current = this.head;
+                    let prev = null;
+                    while (current != null) {
+                        if (current.data === data) {
+                            if (prev == null) {
+                                this.head = current.next;
+                            } else {
+                                prev.next = current.next;
+                            }
+                            this.size--;
+                            return current.data;
+                        }
+                        prev = current;
+                        current = current.next;
+                    }
+                    return -1;
+                }
+                print() {
+                    let current = this.head;
+                    while (current) {
+                        console.log(current.data);
+                        current = current.next;
+                    }
+                }
+            }
+            let list = new LinkedList();
+            list.add(1);
+            list.add(2);
+            list.add(3);
+            list.add(4);
+            list.add(5);
+            list.add(6);
+            list.remove(6);
+            list.print();
+        
+            </code>
+        </pre>
+        <p class="h4">
+            same for c#:
+        </p>
+        <pre>
+            <code>
+                
+// For loop
+for (int i = 0; i < 10; i++)
+{
+    // Code to execute
+}
+
+// While loop
+while (condition)
+{
+    // Code to execute
+}
+
+// Do-while loop
+do
+{
+    // Code to execute
+} while (condition);
+
+// Foreach loop
+foreach (var item in collection)
+{
+    // Code to execute
+}
+
+// Break statement
+for (int i = 0; i < 10; i++)
+{
+    if (i == 5)
+    {
+        break;
+    }
+    // Code to execute
+}
+
+// Continue statement
+for (int i = 0; i < 10; i++)
+{
+    if (i == 5)
+    {
+        continue;
+    }
+    // Code to execute
+}
+
+            </code>
+        </pre>
+        <p class="h4">
+            Data Structure:
+        </p>
+        <pre>
+            <code>
+//Array             
+// Declaration
+int[] array = new int[5];
+
+// Initialization
+int[] array = { 1, 2, 3, 4, 5 };
+
+// Accessing elements
+int firstElement = array[0];
+int lastElement = array[array.Length - 1];
+
+// Looping through elements
+for (int i = 0; i < array.Length; i++)
+{
+    int element = array[i];
+    // Code to execute
+}
+//List
+
+// Declaration
+List list = new List();
+
+// Adding elements
+list.Add(1);
+list.Add(2);
+list.Add(3);
+
+// Removing elements
+list.Remove(2);
+
+// Accessing elements
+int firstElement = list[0];
+int lastElement = list[list.Count - 1];
+
+// Looping through elements
+foreach (int element in list)
+{
+    // Code to execute
+}
+//Dictionary
+
+// Declaration
+Dictionary dictionary = new Dictionary();
+
+// Adding elements
+dictionary.Add("key1", 1);
+dictionary.Add("key2", 2);
+dictionary.Add("key3", 3);
+
+// Removing elements
+dictionary.Remove("key2");
+
+// Accessing elements
+int value = dictionary["key1"];
+
+// Checking existence of key
+bool exists = dictionary.ContainsKey("key1");
+
+// Looping through elements
+foreach (KeyValuePair pair in dictionary)
+{
+    string key = pair.Key;
+    int value = pair.Value;
+    // Code to execute
+}
+
+//Sorted List
+
+// Declaration
+SortedList sortedList = new SortedList();
+
+// Adding elements
+sortedList.Add("key1", 1);
+sortedList.Add("key2", 2);
+sortedList.Add("key3", 3);
+
+// Removing elements
+sortedList.Remove("key2");
+
+// Accessing elements
+int value = sortedList["key1"];
+
+// Checking existence of key
+bool exists = sortedList.ContainsKey("key1");
+
+// Looping through elements
+foreach (KeyValuePair pair in sortedList)
+{
+    string key = pair.Key;
+    int value = pair.Value;
+    // Code to execute
+}
+
+//HashSet
+
+// Declaration
+HashSet hashSet = new HashSet();
+
+// Adding elements
+hashSet.Add(1);
+hashSet.Add(2);
+hashSet.Add(3);
+
+// Removing elements
+hashSet.Remove(2);
+
+// Checking existence of element
+bool exists = hashSet.Contains(1);
+
+// Looping through elements
+foreach (int element in hashSet)
+{
+    // Code to execute
+}
+
+//Queue
+
+// Declaration
+Queue queue = new Queue();
+
+// Adding elements
+queue.Enqueue(1);
+queue.Enqueue(2);
+queue.Enqueue(3);
+
+// Removing elements
+int firstElement = queue.Dequeue();
+
+// Accessing elements
+int firstElement = queue.Peek();
+
+// Checking existence of element
+bool exists = queue.Contains(1);
+
+// Looping through elements
+foreach (int element in queue)
+{
+    // Code to execute
+}
+
+//Stack
+
+// Declaration
+Stack stack = new Stack();
+
+// Adding elements
+stack.Push(1);
+stack.Push(2);
+stack.Push(3);
+
+// Removing elements
+int lastElement = stack.Pop();
+
+// Accessing elements
+int lastElement = stack.Peek();
+
+// Checking existence of element
+bool exists = stack.Contains(1);
+
+// Looping through elements
+foreach (int element in stack)
+{
+    // Code to execute
+}
+
+//LinkedList
+
+// Declaration
+LinkedList linkedList = new LinkedList();
+
+// Adding elements
+linkedList.AddFirst(1);
+linkedList.AddLast(3);
+linkedList.AddAfter(linkedList.First, 2);
+
+// Removing elements
+linkedList.Remove(2);
+
+// Accessing elements
+int firstElement = linkedList.First.Value;
+int lastElement = linkedList.Last.Value;
+
+// Checking existence of element
+bool exists = linkedList.Contains(1);
+
+// Looping through elements
+foreach (int element in linkedList)
+{
+    // Code to execute
+}
+        </code>
+        </pre>
+    </div>
+
+    <div>
+        <p class="h4">Generate N uniform random variates in [0,1) and determine the distribution into class intervals [i/k, (i+1)/k), i = 0,..., k-1.
+            Play with N and k values and draw some conclusion on the "shape" of the distribution.</p>
+        <p class="h5">Solution in JavaScript:</p>
+        <pre>
+            <code>
+                function generate() {
+                    var N = document.getElementById("N").value;
+                    var k = document.getElementById("k").value;
+                    var output = document.getElementById("output3");
+                    output.innerHTML = "";
+            
+                    var randoms = [];
+                    for (var i = 0; i < N; i++) {
+                        randoms.push(Math.random());
+                    }
+            
+                    var classIntervals = [];
+                    for (var i = 0; i < k; i++) {
+                        classIntervals.push([i / k, (i + 1) / k]);
+                    }
+            
+                    var classFreq = {};
+                    for (var i = 0; i < classIntervals.length; i++) {
+                        classFreq[i] = 0;
+                    }
+            
+                    for (var i = 0; i < randoms.length; i++) {
+                        for (var j = 0; j < classIntervals.length; j++) {
+                            if (randoms[i] >= classIntervals[j][0] && randoms[i] < classIntervals[j][1]) {
+                                classFreq[j]++;
+                            }
+                        }
+                    }
+            
+                    for (var i = 0; i < classIntervals.length; i++) {
+                        output.innerHTML += "[" + classIntervals[i][0] + ", " + classIntervals[i][1] + "): " + classFreq[i] + "";
+                    }
+            
+                    // Create a histogram using Chart.js library
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: classIntervals.map(interval => "[" + interval[0] + ", " + interval[1] + ")"),
+                            datasets: [{
+                                label: 'Frequency',
+                                data: Object.values(classFreq),
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                }
+            </code>
+        </pre>
+        <p class="h5">Solution in C#:</p>
+        <pre>
+            <code>
+                using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
+
+class Program
+{
+    static void Main()
+    {
+        int N = 100; // Replace with the value from your "N" input
+        int k = 10;  // Replace with the value from your "k" input
+
+        Random random = new Random();
+        List randoms = new List();
+        for (int i = 0; i < N; i++)
+        {
+            randoms.Add(random.NextDouble());
+        }
+
+        List> classIntervals = new List>();
+        for (int i = 0; i < k; i++)
+        {
+            double start = i / (double)k;
+            double end = (i + 1) / (double)k;
+            classIntervals.Add(Tuple.Create(start, end));
+        }
+
+        Dictionary classFreq = new Dictionary();
+        for (int i = 0; i < classIntervals.Count; i++)
+        {
+            classFreq[i] = 0;
+        }
+
+        for (int i = 0; i < randoms.Count; i++)
+        {
+            for (int j = 0; j < classIntervals.Count; j++)
+            {
+                if (randoms[i] >= classIntervals[j].Item1 && randoms[i] < classIntervals[j].Item2)
+                {
+                    classFreq[j]++;
+                }
+            }
+        }
+
+        // Create a Windows Forms application
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+
+        // Create a form and chart
+        Form form = new Form
+        {
+            Text = "Histogram",
+            Size = new System.Drawing.Size(600, 400)
+        };
+
+        Chart chart = new Chart();
+        chart.Size = new System.Drawing.Size(560, 320);
+        chart.Location = new System.Drawing.Point(20, 40);
+
+        // Create a chart area and add it to the chart
+        ChartArea chartArea = new ChartArea();
+        chart.ChartAreas.Add(chartArea);
+
+        // Create a series for the histogram
+        Series series = new Series();
+        series.ChartType = SeriesChartType.Column;
+
+        // Add data points to the series
+        foreach (var interval in classIntervals)
+        {
+            double xValue = (interval.Item1 + interval.Item2) / 2;
+            int yValue = classFreq[classIntervals.IndexOf(interval)];
+            series.Points.AddXY(xValue, yValue);
+        }
+
+        // Add the series to the chart
+        chart.Series.Add(series);
+
+        // Add the chart to the form
+        form.Controls.Add(chart);
+
+        // Show the form
+        Application.Run(form);
+    }
+}
+
+            </code>
+        </pre>
+    </div>
+    <script>
+        var matrix = [];
+        var numCols;
+        var numRows;
+        function tsvParser(input){ //we get the file to analyze and put the results in a matrix
+            let file = input.files[0];//here we store the content of the file
+            let reader = new FileReader();
+            reader.readAsText(file);//actually read the the content of the file as plain text
+            reader.onload = ()=>{
+                const content = reader.result;
+                const rows = content.split('\n');
+                rows.forEach((row) => {
+                    const columns = row.split('\t')
+                    matrix.push(columns);//we push the results in a matrix which is an array made of arrays
+                });
+                evalFrequency();
+                calculateFrequencies();
+            };
+            reader.onerror = ()=>{
+                console.log(reader.error)
+            };
+        }
+        function evalFrequency(){
+            //initializing objects to calculate absolute frequency
+            var ageFrequency = {};
+            var backgroundFrequency = {};
+            var heightFrequency = {};
+            //actual frequency calculation
+            matrix.forEach((column)=>{
+                for (let row = 0; row < matrix.length; row++) {//first for is for age frequency
+                    if(matrix[0][column] === document.querySelector(exampleInputEmail1).value){
+                        let age = matrix[row][column];
+                        ageFrequency += (age || 0) + 1;
+                    }
+                }
+                for (let row = 0; row < matrix.length; row++) {//second for is for height frequency
+                    if(matrix[0][column] === document.querySelector(exampleInputPassword1).value){
+                        let height = parseFloat(matrix[row][column]);
+                        heightFrequency += (height || 0) + 1;
+                    }
+                }
+                for (let row = 0; row < matrix.length; row++) {//third for is for background frequency
+                    if(matrix[0][column] === document.querySelector(exampleInputVariable1).value){
+                        let background = parseFloat(matrix[row][column]);
+                        backgroundFrequency += (background || 0) + 1;
+                    }
+                }
+            });
+            displayTable(ageFrequency, document.querySelector(exampleInputEmail1));
+            displayTable(backgroundFrequency, document.querySelector(exampleInputPassword1));
+            displayTable(heightFrequency, document.querySelector(exampleInputVariable1).value);
+        }
+        function displayTable(frequencies, variable) {
+            var table = '<h3>' + variable + '</h3>';
+            table += '<table>';
+            table += '<tr><th>Value</th><th>Absolute Frequency</th><th>Relative Frequency</th><th>Percentage</th></tr>';
+
+            var total = Object.values(frequencies).reduce((acc, val) => acc + val, 0);
+
+            Object.entries(frequencies).forEach(function ([key, value]) {
+                var relativeFrequency = value / total;
+                var percentage = (relativeFrequency * 100).toFixed(2) + '%';
+
+                table += '<tr><td>' + key + '</td><td>' + value + '</td><td>' + relativeFrequency.toFixed(2) + '</td><td>' + percentage + '</td></tr>';
+            });
+
+            table += '</table>';
+            document.body.innerHTML += table;
+        }
+        function calculateFrequencies(input = matrix) {
+            // Initialize objects for frequencies
+            var combinedFrequency = {};
+
+            // Calculate frequencies for combined
+            input.forEach(function (row) {
+                var combined = row.join(' - ');
+                combinedFrequency[combined] = (combinedFrequency[combined] || 0) + 1;
+            });
+
+            // Display the results in a table
+            displayTableJ(combinedFrequency, 'Combined (Background - Age)');
+        }
+        function displayTableJ(frequencies, variable) {
+            var table = '<h3>' + variable + '</h3>';
+            table += '<table>';
+            table += '<tr><th>Value</th><th>Frequency</th></tr>';
+
+            Object.entries(frequencies).forEach(function ([key, value]) {
+                table += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
+            });
+
+            table += '</table>';
+            document.getElementById('resultTables').innerHTML = table;
+        }
+    </script>
+</body>
+</html>
