@@ -73,9 +73,8 @@
                 })
             } 
 
-            function addToSelect(){
+            function addToSelect(){//adding to the form the multiple variable
                 readTSV((completeMatrix) => {
-                    console.log('I\'m in event');
                     let header = completeMatrix[0];
                     let sel = document.getElementById("var");
                     for (let i = 0; i < header.length; i++) {
@@ -88,17 +87,58 @@
                 });
                 
             }
-            document.addEventListener("DOMContentLoaded", addToSelect);
+            document.addEventListener("DOMContentLoaded", addToSelect());
 
             function load(){
                 let sel = document.getElementById("var");
                 sel.onload = addToSelect();
             }
+
+            var selectedVariable = [];
+
+            document.addEventListener("click", ()=>{
+                const button = document.getElementById("addVariable");
+                const sel = document.getElementById("var");
+                const errorPar = document.createElement("p");
+                errorPar.id = "errorPar";
+                errorPar.innerText = "You already selected this variable";
+                errorPar.hidden = true;
+                const answerDiv = document.getElementById("variableDiv");
+                answerDiv.appendChild(errorPar);
+                console.log('inside the event');
+                button.onclick=()=>{
+                    const table = document.getElementById("variableSelected");
+                    const entry = document.createElement("li");
+                    if (selectedVariable.includes(sel.value)) {
+                        const innerErrorPar = document.getElementById("errorPar");
+                        innerErrorPar.hidden = false;
+                        console.log(errorPar.hidden);
+                    } else {
+                        selectedVariable.push(sel.value);
+                        entry.innerText = selectedVariable[selectedVariable.length - 1];
+                        table.appendChild(entry);
+                        console.log(errorPar.hidden);
+                        const innerErrorPar = document.getElementById("errorPar");
+                        innerErrorPar.hidden = true;
+                    }
+                        
+                }
+            });
+            
+
+
         </script>
         <form>
             <label for="variables">Choose a variable</label>
             <select name="variables" id="var" onload="addToSelect"></select>
-            <button>Add to variables to calculate the frequency</button>
+            <button type="button" id="addVariable" onclick="click()">Add to variables to calculate the frequency</button>
+            <button type="button" id="evalButton">Calculate frequencies</button>
+            <div id="variableDiv">
+                <p>You selected the following variables:</p>
+                <ul id="variableSelected">
+
+                </ul>
+            </div>
         </form>
         
 

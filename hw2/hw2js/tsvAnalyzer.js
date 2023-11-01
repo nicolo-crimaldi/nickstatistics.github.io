@@ -1,33 +1,41 @@
 
-function evalFrequency(){
-//initializing objects to calculate absolute frequency
-    var ageFrequency = {};
-    var backgroundFrequency = {};
-    var heightFrequency = {};
-    //actual frequency calculation
-    matrix.forEach((column)=>{
-        for (let row = 0; row < matrix.length; row++) {//first for is for age frequency
-            if(matrix[0][column] === document.querySelector(exampleInputEmail1).value){
-                let age = matrix[row][column];
-                ageFrequency += (age || 0) + 1;
+function evalFrequency(variableArray, nIntervals){
+    const max = Math.max(...variableArray);
+    const min = Math.min(...variableArray);
+    const span = (max - min) / nIntervals;//we establish the radius for a single interval
+    const absoluteFrequency[nIntervals] = [];//this array contains the frequency distribution for every interval of the variable selected
+
+    for (let i = 0; i < absoluteFrequency.length; i++) {
+        variableArray.forEach((element) => {
+            if ((element >= min * i && element <= (min * i) + span) || element >= max) {//check if the current element is in the current interval
+                absoluteFrequency[i] = (absoluteFrequency[i] || 0) + 1;//update the frequency using the or with 0
             }
-        }
-        for (let row = 0; row < matrix.length; row++) {//second for is for height frequency
-            if(matrix[0][column] === document.querySelector(exampleInputPassword1).value){
-                let height = parseFloat(matrix[row][column]);
-                heightFrequency += (height || 0) + 1;
-                }
-        }
-        for (let row = 0; row < matrix.length; row++) {//third for is for background frequency
-            if(matrix[0][column] === document.querySelector(exampleInputVariable1).value){
-                let background = parseFloat(matrix[row][column]);
-                backgroundFrequency += (background || 0) + 1;
-            }
-        }
-    });
-    displayTable(ageFrequency, document.querySelector(exampleInputEmail1));
-    displayTable(backgroundFrequency, document.querySelector(exampleInputPassword1));
-    displayTable(heightFrequency, document.querySelector(exampleInputVariable1).value);
+        });
+    }
+
+    return absoluteFrequency;
+}
+
+function relativeFrequency(variableArray, nIntervals){
+    let relativeFrequency = [];
+    let absoluteFrequency = evalFrequency(variableArray, nIntervals); 
+    for (let i = 0; i < absoluteFrequency.length; i++) {
+        relativeFrequency.forEach((element) => {
+            element = absoluteFrequency[i]/absoluteFrequency.length;
+        });
+    }
+    return relativeFrequency;
+}
+
+function percentageFrequency(variableArray, nIntervals){
+    let percentageFrequency = [];
+    let relativeFrequency = relativeFrequency(variableArray, nIntervals);
+    for (let i = 0; i < relativeFrequency.length; i++) {
+        percentageFrequency.forEach((element) => {
+            element = relativeFrequency[i] * 100;
+        });        
+    }
+    return percentageFrequency;
 }
                     
 
