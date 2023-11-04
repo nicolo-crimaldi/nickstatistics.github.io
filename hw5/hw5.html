@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework 5</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+</head>
+<body>
+<h1>Statistics Homework 5</h1>
+
+<p>
+    M servers are subject to attacks during a period of time T (for instance 1 year).
+    Subdivide the interval T in N subinterval of size T/N and in each of this suppose that
+    an attack can occur with probability λ T/N.
+    Simulate the attacks to the M servers and represent each of them with a line which
+    makes jumps of 1 at each attack event.
+</p>
+
+<p>
+    Using the same objects ("movable/resizable rectangle", histogram, etc.) of the previous homework 3
+    draw vertically on the line chart the 2 histograms representing the distribution of the number
+    of attacks at the end of the period and one internal istant for comparison.
+</p>
+    
+<p>
+    Study what happens asymptotically, for N large, and a number of systems M a sufficient to give shape to
+    a simulated distribution. Make some personal considerations about the shape and the average of the distributions that you see.
+
+    <form>
+        <div class="mb-3">
+          <label for="serverNumber" class="form-label">Enter server number</label>
+          <input type="number" class="form-control" id="serverNumber" aria-describedby="emailHelp">
+        </div>
+        <div class="mb-3">
+          <label for="subIntervalNumber" class="form-label">Enter the number of subinterval</label>
+          <input type="number" class="form-control" id="subIntervalNumber">
+        </div>
+        <div class="mb-3">
+            <label for="lambda" class="form-label">Enter the number of attacks</label>
+            <input type="number" class="form-control" id="lambda">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="avviaAnimazione()">Calculate</button>
+    </form>
+
+    <div>
+        <canvas id="grafico"></canvas>
+    </div>
+    
+
+    <script src="./ServerList.js"></script><!--Cambiare il path per lo script-->
+    <script>
+        var canvas = document.getElementById('grafico');
+        var ctx = canvas.getContext('2d');
+        canvas.width = 1000;
+        canvas.height = 1000;
+        var originX = 500;
+        var originY = 500;
+
+        function getRandomColor() {
+            // Genera valori casuali per i canali R, G e B
+            var r = Math.floor(Math.random() * 256); // Valore tra 0 e 255
+            var g = Math.floor(Math.random() * 256);
+            var b = Math.floor(Math.random() * 256);
+        
+            // Componi il colore in formato "rgb(r, g, b)"
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+
+        function avviaAnimazione(){
+            const M = document.getElementById('serverNumber').value;
+            M = parseInt(M);
+            const N = document.getElementById('subIntervalNumber');
+            N = parseInt(N);
+            const lambda = document.getElementById('lambda');
+            lambda = parseInt(lambda);
+            if (N < 1 || M < 1) {
+                alert("I numeri devono essere >= 1");
+            } else{
+                const servers = new ServerList(N, lambda, M);
+                ctx.beginPath();
+                ctx.moveTo(originX, 0);
+                ctx.lineTo(originX, canvas.height);
+                ctx.moveTo(0, originY);
+                ctx.lineTo(canvas.width, originY);
+
+                for(let i = 1; i <= N; i++){
+                    var xValue = i * 20;
+                    var yValue = i * 20;
+                    ctx.fillText(i, originX + xValue, originY + 12);
+                    ctx.fillText(i, originX - 16, originY - yValue + 6);
+                }
+                ctx.stroke();
+
+                var x = 0;
+
+                let res = []; //keep track of last y value
+                let xEnd = [];
+                let yEnd = [];
+                for(let i = 0; i < N; i++){
+                    res[i] = 0;
+                    xEnd[i] = 0;
+                    yEnd[i] = 0;
+                }
+
+                for(let i = 0; i < servers.length; i++){
+                    if (xEnd[i] === 0) {
+                        ctx.beginPath();
+                        ctx.moveTo(originX, originY);
+                    }
+                    for(let j = 0; j < servers.serverList[i].length; j++){
+                        if (servers.serverList[i].attackList[j] === 1) {
+                            res[i]++
+                        }
+                        y += res[i];
+                        xEnd[i] = x;
+                        yEnd[i] = y;
+
+                        var canvasX = originX + xEnd[i] * 20;
+                        var canvasY = originY + yEnd[i] * 20;
+
+                        ctx.lineTo(canvasX, canvasY);
+                        ctx.strokeStyle = getRandomColor();
+                    }
+                }
+            }
+        }
+
+    </script>
+    <script src="../hw3/ex1/form/rectScript.js"></script><!--Cambiare il path per lo script-->
+</body>
+</html>
