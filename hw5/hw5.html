@@ -53,20 +53,25 @@
     
     <script>
         class Server{
+            subIntervalNumber;
             attackList = [];
+            lambda;
 
             constructor(subIntervalNumber, lambda){
                 this.setAttack(subIntervalNumber, lambda);
             }
 
             setAttack(subIntervalNumber, lambda){
+                this.subIntervalNumber = subIntervalNumber;
+                this.lambda = lambda;
                 //console.log('dentro setAttack'); //Fino a qui entra
                 const p = lambda / subIntervalNumber;
                 for(let i = 0; i < lambda; i++){
                     console.log('dentro setAttack for');
-                    if(Math.random() > p){
+                    const prob = Math.random();
+                    if(prob >= p){
                         this.attackList.push(1);
-                        console.log(this.attackList[i]);
+                        console.log(`Attacco successo con probabilità ${prob}`);
                     } else{
                         this.attackList.push(0);
                         console.log(this.attackList[i]);
@@ -139,13 +144,13 @@
             //console.log('in event');
             let M = document.getElementById('serverNumber').value;
             M = parseInt(M);
-            console.log(`Type of M: ${typeof(M)}`);//fino a qui entra
-            let N = document.getElementById('subIntervalNumber');
+            console.log(`Type of M: ${typeof(M)} value: ${M}`);
+            let N = document.getElementById('subIntervalNumber').value;
             N = parseInt(N);
-            console.log(`Type of N: ${typeof(N)}`);
-            let lambda = document.getElementById('lambda');
+            console.log(`Type of N: ${typeof(N)} value: ${N}`);
+            let lambda = document.getElementById('lambda').value;
             lambda = parseInt(lambda);
-            console.log(`Type of lambda: ${typeof(lambda)}`);
+            console.log(`Type of lambda: ${typeof(lambda)} value: ${lambda}`);
             if (N < 1 || M < 1) {
                 alert("I numeri devono essere >= 1");
             } else{
@@ -176,7 +181,7 @@
                     yEnd[i] = 0;
                 }
             
-                for(let i = 0; i < servers.length; i++){
+                for(let i = 0; i < servers.serverList.length; i++){
                     if (xEnd[i] === 0) {
                         ctx.beginPath();
                         ctx.moveTo(originX, originY);
