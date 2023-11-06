@@ -53,8 +53,6 @@
     
     <script>
         class Server{
-            subIntervalNumber;
-            lambda;
             attackList = [];
 
             constructor(subIntervalNumber, lambda){
@@ -62,15 +60,18 @@
             }
 
             setAttack(subIntervalNumber, lambda){
-                this.lambda = lambda;
-                this.subIntervalNumber = subIntervalNumber;
+                //console.log('dentro setAttack'); //Fino a qui entra
                 const p = lambda / subIntervalNumber;
-                for(let i = 0; i < this.attackList.length; i++){
+                for(let i = 0; i < lambda; i++){
+                    console.log('dentro setAttack for');
                     if(Math.random() > p){
                         this.attackList.push(1);
+                        console.log(this.attackList[i]);
                     } else{
                         this.attackList.push(0);
+                        console.log(this.attackList[i]);
                     }
+                    //console.log(attackList[i]);
                 }
             }
 
@@ -85,7 +86,9 @@
 
             setServerList(subIntervalNumber, lambda, serverNumber){
                 for (let i = 0; i < serverNumber; i++) {
+                    //console.log(`Dentro setServerList`);
                     const server = new Server(subIntervalNumber, lambda);
+                    console.log(server);
                     this.serverList.push(server);
                 }
             }
@@ -133,17 +136,21 @@
         }
 
         function avviaAnimazione(){
-            console.log('in event');
+            //console.log('in event');
             let M = document.getElementById('serverNumber').value;
             M = parseInt(M);
+            console.log(`Type of M: ${typeof(M)}`);//fino a qui entra
             let N = document.getElementById('subIntervalNumber');
             N = parseInt(N);
+            console.log(`Type of N: ${typeof(N)}`);
             let lambda = document.getElementById('lambda');
             lambda = parseInt(lambda);
+            console.log(`Type of lambda: ${typeof(lambda)}`);
             if (N < 1 || M < 1) {
                 alert("I numeri devono essere >= 1");
             } else{
                 const servers = new ServerList(N, lambda, M);
+                console.log(servers);
                 ctx.beginPath();
                 ctx.moveTo(originX, 0);
                 ctx.lineTo(originX, canvas.height);
