@@ -1,20 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Law of Large Numbers</title>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <div>
-        <p class="h1">Law of Large Numbers</p>
-        <p>In probability theory the <b>law of large numbers</b> is a theorem that describes the results of an experiment performed a large number of times. It states that: <i>the average of the results obtained from a large number of trials should be close to the expected value and tends to become closer to the expected value as more trials are performed</i></p>
-        <p>There are two forms of this law.</p>
-        <p class="lead">Weak form</p>
-        <p>The weak law of large numbers states that the sample average converges in probability towards the expected value.</p>
-        
+    <div class="container">
+        <h1 class="mt-4">Law of Large Numbers</h1>
+
+        <div class="mt-4">
+            <h2>Weak Law of Large Numbers (WLLN)</h2>
+            <p>The Weak Law of Large Numbers states that as the sample size of a random variable increases, the sample mean converges in probability to the population mean.</p>
+
+            <p>Mathematically, for a sequence of random variables X₁, X₂, X₃, ..., which are i.i.d. (independent and identically distributed) with a finite mean (μ) and variance (σ²), the weak law can be expressed as:</p>
+
+            <p>For any ε &gt; 0:</p>
+            <p>lim<span style="vertical-align: sub;">(n → ∞)</span> P(|(X̄n - μ)| &lt; ε) = 1</p>
+
+            <h3 class="mt-3">Proof of Weak Law of Large Numbers</h3>
+            <p>The proof of the Weak Law of Large Numbers is based on Chebyshev's inequality and properties of expectations and variances. Let's outline the key steps of the proof:</p>
+
+            <ol>
+                <li>Start with the Chebyshev inequality:</li>
+                <p>P(|X - E[X]| &ge; ε) ≤ Var(X) / ε²</p>
+
+                <li>Apply Chebyshev to the sample mean X̄n:</li>
+                <p>P(|X̄n - μ| &ge; ε) ≤ Var(X̄n) / ε²</p>
+
+                <li>Use properties of expectations and variances:</li>
+                <p>Var(X̄n) = Var(X) / n</p>
+
+                <li>Substitute this into the inequality:</li>
+                <p>P(|X̄n - μ| &ge; ε) ≤ Var(X) / (nε²)</p>
+
+                <li>Take the limit as n → ∞:</li>
+                <p>lim<span style="vertical-align: sub;">(n → ∞)</span> P(|X̄n - μ| &ge; ε) = 0</p>
+            </ol>
+
+            <p>Thus, the Weak Law of Large Numbers is proved, showing that as n increases, the probability of X̄n being close to μ approaches 1.</p>
+        </div>
+
+        <div class="mt-4">
+            <h2>Strong Law of Large Numbers (SLLN)</h2>
+            <p>The Strong Law of Large Numbers is a stronger version of the law, stating that the sample mean converges almost surely to the population mean as the sample size increases.</p>
+
+            <p>Mathematically, for the same sequence of i.i.d. random variables X₁, X₂, X₃, ..., the strong law can be expressed as:</p>
+
+            <p>P(lim<span style="vertical-align: sub;">(n → ∞)</span> X̄n = μ) = 1</p>
+
+            <h3 class="mt-3">Proof of Strong Law of Large Numbers</h3>
+            <p>The proof of the Strong Law of Large Numbers is more intricate and typically involves advanced probability theory and measure theory. The key concept in this proof is the Borel-Cantelli lemmas and Kolmogorov's zero-one law. Here's a simplified outline:</p>
+
+            <ol>
+                <li>Define events A₁, A₂, A₃, ...:</li>
+                <p>Aₙ = {lim<span style="vertical-align: sub;">(n → ∞)</span> X̄n = μ}</p>
+
+                <li>Apply Borel-Cantelli lemma:</li>
+                <p>If Σ P(Aₙ) &lt; ∞, then P(lim Aₙ) = 0</p>
+
+                <li>Prove Σ P(Aₙ) &lt; ∞:</li>
+                <p>This step involves using Kolmogorov's zero-one law, and it requires detailed probability theory.
+
+                <li>Conclude that lim Aₙ = μ almost surely:</li>
+                <p>Since Σ P(Aₙ) &lt; ∞, it implies that lim Aₙ = μ almost surely.</p>
+            </ol>
+
+            <p>These laws are fundamental in probability theory and statistics, providing the theoretical basis for the reliability of sample means as estimators of population means.</p>
+        </div>
     </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

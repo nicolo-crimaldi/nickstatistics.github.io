@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Central Limit Theorem</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Central Limit Theorem</h1>
+
+        <div class="mt-4">
+            <h2>The Central Limit Theorem (CLT)</h2>
+            <p>The Central Limit Theorem is a fundamental concept in probability theory and statistics. It states that the distribution of the sum (or average) of a large number of independent, identically distributed random variables approaches a normal distribution, regardless of the underlying population distribution.</p>
+
+            <h3 class="mt-3">Statement of CLT</h3>
+            <p>Let X₁, X₂, X₃, ... be a sequence of independent and identically distributed random variables with mean (μ) and variance (σ²). Then, as n (the sample size) becomes large:</p>
+            <p>X̄n ≈ N(μ, σ²/n)</p>
+
+            <h3 class="mt-3">Key Points:</h3>
+            <ul>
+                <li>The CLT is valid for both discrete and continuous random variables.</li>
+                <li>The larger the sample size (n), the closer the sample mean X̄n is to a normal distribution.</li>
+                <li>The CLT is a powerful tool for statistical inference, as it allows us to make inferences about the population even when we don't know the population's distribution.</li>
+            </ul>
+
+            <h3 class="mt-3">Proof of Central Limit Theorem (Simplified)</h3>
+            <p>The full proof of the Central Limit Theorem involves complex mathematical concepts, such as characteristic functions. Here, we provide a simplified outline:</p>
+
+            <ol>
+                <li>Start with the moment generating function (MGF) of X̄n:</li>
+                <p>M(t) = E[e^(tX̄n)]</p>
+
+                <li>Use properties of expectations:</li>
+                <p>M(t) = E[e^(t/n * (X₁ + X₂ + ... + Xn))]</p>
+
+                <li>Assume MGF exists for X₁, X₂, ..., and they are i.i.d.:</li>
+                <p>M(t) = [M(t/n)]ⁿ</p>
+
+                <li>Take the limit as n → ∞:</li>
+                <p>lim<span style="vertical-align: sub;">(n → ∞)</span> M(t) = e^(σ²t²/2)</p>
+
+                <li>Recognize the MGF of a normal distribution:</li>
+                <p>M(t) = e^(μt + σ²t²/2)</p>
+
+                <li>Conclude that X̄n ≈ N(μ, σ²/n) based on the MGF of a normal distribution.</li>
+            </ol>
+
+            <p>The Central Limit Theorem is a cornerstone of statistics, providing a bridge between the behavior of large samples and the properties of the normal distribution.</p>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
