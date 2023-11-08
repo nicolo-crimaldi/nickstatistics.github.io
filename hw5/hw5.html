@@ -1,220 +1,178 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homework 5</title>
+    <title>Chart Simulation</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+    <link href="rectCss.css" rel="stylesheet"/>
+
 </head>
+
 <body>
-<h1>JS part HW5</h1>
-
-<p>
-    M servers are subject to attacks during a period of time T (for instance 1 year).
-    Subdivide the interval T in N subinterval of size T/N and in each of this suppose that
-    an attack can occur with probability λ T/N.
-    Simulate the attacks to the M servers and represent each of them with a line which
-    makes jumps of 1 at each attack event.
-</p>
-
-<p>
-    Using the same objects ("movable/resizable rectangle", histogram, etc.) of the previous homework 3
-    draw vertically on the line chart the 2 histograms representing the distribution of the number
-    of attacks at the end of the period and one internal istant for comparison.
-</p>
+    <h1>Chart Simulation</h1>
+    <label for="systemsCount">Systems Count: </label>
+    <input type="number" id="systemsCount" value="10"><br>
+    <label for="subIntervals">Sub-Intervals: </label>
+    <input type="number" id="subIntervals" value="50"><br>
+    <label for="lambda">Lambda: </label>
+    <input type="number" id="lambda" value="0.1"><br>
+    <button id="calculateButton">Calculate</button><br>
     
-<p>
-    Study what happens asymptotically, for N large, and a number of systems M a sufficient to give shape to
-    a simulated distribution. Make some personal considerations about the shape and the average of the distributions that you see.
-
-    <form>
-        <div class="mb-3">
-          <label for="serverNumber" class="form-label">Enter server number</label>
-          <input type="number" class="form-control" id="serverNumber">
-        </div>
-        <div class="mb-3">
-          <label for="subIntervalNumber" class="form-label">Enter the number of subinterval</label>
-          <input type="number" class="form-control" id="subIntervalNumber">
-        </div>
-        <div class="mb-3">
-            <label for="lambda" class="form-label">Enter the number of attacks</label>
-            <input type="number" class="form-control" id="lambda">
-        </div>
-        <button type="button" class="btn btn-primary" onclick="avviaAnimazione()">Calculate</button>
-    </form>
-
     <div class="container">
-        <canvas id="myCanvas"></canvas>
+    <canvas id="chartCanvas" width="800" height="400"></canvas>
     </div>
-    
     <script>
+        const chartCanvas = document.getElementById('chartCanvas');
+        const ctx = chartCanvas.getContext('2d');
+        const chartWidth = chartCanvas.width;
+        const chartHeight = chartCanvas.height;
 
-        let M = 0;
-        let N = 0;
-        let lambda = 0;
+        const systemsCountInput = document.getElementById('systemsCount');
+        const subIntervalsInput = document.getElementById('subIntervals');
+        const lambdaInput = document.getElementById('lambda');
+        const calculateButton = document.getElementById('calculateButton');
 
-        class Server{
-            subIntervalNumber;
-            lambda;
-            attackList = [];
+        let systemsCount = parseInt(systemsCountInput.value, 10);
+        let subIntervals = parseInt(subIntervalsInput.value, 10);
+        let lambda = parseFloat(lambdaInput.value);
 
-            constructor(subIntervalNumber, lambda){
-                this.setAttack(subIntervalNumber, lambda);
-            }
-
-            setAttack(subIntervalNumber, lambda){
-                this.lambda = lambda;
-                this.subIntervalNumber = subIntervalNumber;
-                const p = lambda / subIntervalNumber;
-                for(let i = 0; i < lambda ; i++){
-                    if(Math.random() > p){
-                        this.attackList.push(1);
-                    } else{
-                        this.attackList.push(0);
-                    }
-                }
-            }
-
-        }
-
-        class ServerList{
-            serverList = [];
-           
-            constructor(subIntervalNumbers, lambda, serverNumber){
-                this.setServerList(subIntervalNumbers, lambda, serverNumber);
-            }
-
-            setServerList(subIntervalNumber, lambda, serverNumber){
-                for (let i = 0; i < serverNumber; i++) {
-                    const server = new Server(subIntervalNumber, lambda);
-                    this.serverList.push(server);
-                }
-            }
-
-        }
-
-
-        const container = document.querySelector('.container');
-        const canvas = document.getElementById('myCanvas');
-        const context = canvas.getContext('2d');
-
-        let isResizing = false;
-
-        container.addEventListener('mousedown', (e) => {
-        if (e.target === container) {
-        isResizing = true;
-        initialX = e.clientX - container.offsetWidth;
-        }
+        calculateButton.addEventListener('click', () => {
+            systemsCount = parseInt(systemsCountInput.value, 10);
+            subIntervals = parseInt(subIntervalsInput.value, 10);
+            lambda = parseFloat(lambdaInput.value);
+            calculateScores();
+            draw();
         });
 
-        document.addEventListener('mousemove', (e) => {
-        if (!isResizing) return;
-        container.style.width = (e.clientX - initialX) + 'px';
-        canvas.width = container.offsetWidth;
-        // Aggiorna il contenuto del canvas se necessario
-        });
+        let scaleX = 50;
+        let scaleY = 50;
+        let chartX = 0;
+        let chartY = 0;
+        let cartesianZoom = 1.0;
 
-        document.addEventListener('mouseup', () => {
-        isResizing = false;
-        });
-        var ctx = canvas.getContext('2d');
-        canvas.width = 1000;
-        canvas.height = 1000;
-        var originX = 500;
-        var originY = 500;
+        let drawingData = [];
+        let firstHalf = 0;
+        let secondHalf = 0;
 
-        function getRandomColor() {
-        // Genera valori casuali per i canali R, G e B
-        var r = Math.floor(Math.random() * 256); // Valore tra 0 e 255
-        var g = Math.floor(Math.random() * 256);
-        var b = Math.floor(Math.random() * 256);
+        function generateRandomColors(count) {
+            const randomColor = () => Math.floor(Math.random() * 256);
+            const colors = [];
 
-        // Componi il colore in formato "rgb(r, g, b)"
-        return 'rgb(' + r + ',' + g + ',' + b + ')';
+            for (let i = 0; i < count; i++) {
+                colors.push(`rgb(${randomColor()}, ${randomColor()}, ${randomColor()})`);
+            }
+
+            return colors;
         }
 
-        function avviaAnimazione(){
-            console.log('in event');
-            M =  parseInt(document.getElementById("serverNumber").value, 10);
-            
-            N =  parseInt(document.getElementById("subIntervalNumber").value, 10);
-            
-            lambda = parseInt(document.getElementById("lambda").value, 10);
-            
-            if (N < 1 || M < 1) {
-                alert("I numeri devono essere >= 1");
-            } else{
-               // const serverStart = new Server (N,lambda);
-                const servers = new ServerList(N, lambda, M);
-                ctx.beginPath();
-                ctx.moveTo(originX, 0);
-                ctx.lineTo(originX, canvas.height);
-                ctx.moveTo(0, originY);
-                ctx.lineTo(canvas.width, originY);
-            
-                for(let i = 1; i <= N; i++){
-                    var xValue = i * 20;
-                    var yValue = i * 20;
-                    ctx.fillText(i, originX + xValue, originY + 12);
-                    ctx.fillText(i, originX - 16, originY - yValue + 6);
-                }
-                ctx.stroke();
-            
-                var x = 0;
-                var y = 0;
-            
-                let res = []; //keep track of last y value
-                let xEnd = [];
-                let yEnd = [];
-                for(let i = 0; i < N; i++){
-                    res[i] = 0;
-                    xEnd[i] = 0;
-                    yEnd[i] = 0;
-                }
-                // PROVE IMPORTANTI
-                console.log(servers.serverList.length);
-                console.log(servers.serverList[0]);
-                console.log(servers.serverList[1]);
-                let w = 0;
-                const Elemento = servers.serverList[w];
-                const lunghezzaPrimoElemento = Object.keys(Elemento).length;
-                console.log("Lunghezza del primo elemento: " + lunghezzaPrimoElemento);
-                // const prova = servers.serverList.attackList[0];
-                //
-                
-                let lunghezzeMembri = []; // ARRAY CHE CONTIENE LA LUNGHEZZA DI serverList[i]
+        let systemColors = generateRandomColors(systemsCount);
 
-                for(let i = 0; i < servers.serverList.length; i++){
-                    if (xEnd[i] === 0) {
-                        ctx.beginPath();
-                        ctx.moveTo(originX, originY);
-                    }
-                    for (let w = 0; w < servers.serverList.length; w++) {
-                        const membro = servers.serverList[w];
-                        const lunghezzaMembro = Object.keys(membro).length;
-                        lunghezzeMembri.push(lunghezzaMembro);
-                    }
-                        console.log(lunghezzeMembri);
-                        for(let j = 0; j < lunghezzeMembri[j]; j++){
-                            if (servers.serverList[i].attackList[j] === 1) {
-                                res[i] = res[i] + 1;
-                            }
-                            y = y + res[i];
-                            xEnd[i] = x;
-                            yEnd[i] = y;
-                
-                            var canvasX = originX + xEnd[i] * 20;
-                            var canvasY = -(originY + yEnd[i] * 20);//va verso l'infinito e oltre
-                
-                            ctx.lineTo(canvasX, canvasY);
-                            ctx.strokeStyle = getRandomColor();
-                            //ctx.stroke();
+
+        function calculateScores() {
+            drawingData = new Array(systemsCount).fill([]);
+            firstHalf = 0;
+            secondHalf = 0;
+
+            for (let currentSystem = 0; currentSystem < systemsCount; currentSystem++) {
+                const systemData = [{ x: 0, y: 0 }];
+                drawingData[currentSystem] = systemData;
+
+                for (let subInterval = 1; subInterval <= subIntervals; subInterval++) {
+                    const successProbability = Math.random();
+
+                    if (successProbability > (lambda / subIntervals)) {
+                        if (subInterval <= subIntervals / 2) {
+                            firstHalf++;
+                            secondHalf++;
+                        } else {
+                            secondHalf++;
                         }
-                        lunghezzeMembri = []; 
-                        y = 0;  
+                        systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y });
+                        systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y + 1 });
+                    } else {
+                        systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y });
+                    }
                 }
             }
         }
+
+        function draw() {
+            ctx.clearRect(0, 0, chartWidth, chartHeight);
+
+            const stepX = scaleX * cartesianZoom;
+            const stepY = scaleY * cartesianZoom;
+            const originX = chartX;
+            const originY = chartY;
+            const pointsCountX = Math.floor(chartWidth / stepX);
+            const pointsCountY = Math.floor(chartHeight / stepY);
+
+            ctx.beginPath();
+            ctx.moveTo(originX, chartHeight);
+            ctx.lineTo(chartWidth, chartHeight);
+            ctx.strokeStyle = 'black'
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(originX, chartHeight);
+            ctx.strokeStyle = 'black'
+            ctx.stroke();
+
+            for (let system = 0; system < systemsCount; system++) {
+                ctx.beginPath();
+
+                for (let point = 0; point < drawingData[system].length - 1; point++) {
+                    const startX = drawingData[system][point].x * scaleX * cartesianZoom + chartX;
+                    const startY = chartHeight - drawingData[system][point].y * scaleY * cartesianZoom;
+                    const endX = drawingData[system][point + 1].x * scaleX * cartesianZoom + chartX;
+                    const endY = chartHeight - drawingData[system][point + 1].y * scaleY * cartesianZoom;
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                }
+
+                ctx.strokeStyle = systemColors[system];
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            drawHistograms();
+        }
+
+        function drawHistograms() {
+            const barWidth = 10.0 / 5.0 * scaleX * cartesianZoom;
+            const startXFirstSeries = (subIntervals / 2) * scaleX * cartesianZoom + chartX;
+            const startXSecondSeries = subIntervals * scaleX * cartesianZoom + chartX;
+            const initialY = chartHeight;
+            const normalizedFirstScore = firstHalf / systemsCount;
+            const normalizedSecondScore = secondHalf / systemsCount;
+            const initialHeight = 4 * scaleY * cartesianZoom;
+            const firstBarHeight = normalizedFirstScore * scaleY * cartesianZoom;
+            const secondBarHeight = normalizedSecondScore * scaleY * cartesianZoom;
+            const yFirstSeries = chartHeight - firstBarHeight;
+            const ySecondSeries = chartHeight - secondBarHeight;
+
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+            ctx.fillRect(startXFirstSeries, yFirstSeries, barWidth, firstBarHeight);
+
+            ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+            ctx.fillRect(startXSecondSeries, ySecondSeries, barWidth, secondBarHeight);
+
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText(firstHalf.toString(), startXFirstSeries + barWidth, yFirstSeries + firstBarHeight / 2);
+            ctx.fillText(secondHalf.toString(), startXSecondSeries + barWidth, ySecondSeries + secondBarHeight / 2);
+        }
+
+        calculateScores();
+        draw();
+
 
     </script>
 </body>
+
+<script src="rectScript.js"></script>
 </html>
