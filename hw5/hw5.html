@@ -1,176 +1,302 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Chart Simulation</title>
-    <style>
-        canvas {
-            border: 1px solid black;
-        }
-    </style>
-    <link href="rectCss.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<style>
+    canvas {
+        border: 1px solid black;
+    }
+
+    /* Stile generale per il body e l'html */
+    body,
+    html {
+        height: 100%;
+        margin: 0;
+    }
+
+    /* Stile per i contenitori dei grafici */
+    .container {
+        width: 50%;
+        /* Imposta la larghezza iniziale del contenitore */
+        padding: 20px;
+        border: 1px solid #000;
+        resize: both;
+        overflow: auto;
+        margin: 20px auto;
+        /* Centra il contenitore e aggiunge spazio tra di essi */
+    }
+
+    /* Stile per il canvas (grafico) all'interno del contenitore */
+    canvas {
+        width: 100%;
+        /* Il canvas riempirà sempre il contenitore */
+        height: 100%;
+        border: 1px solid #000;
+        display: block;
+    }
+</style>
 
 </head>
 
 <body>
-    <h1>Chart Simulation</h1>
-    <label for="systemsCount">Systems Count: </label>
-    <input type="number" id="systemsCount" value="10"><br>
-    <label for="subIntervals">Sub-Intervals: </label>
-    <input type="number" id="subIntervals" value="50"><br>
-    <label for="lambda">Lambda: </label>
-    <input type="number" id="lambda" value="0.1"><br>
-    <button id="calculateButton">Calculate</button><br>
-    
-    <div class="container">
+<h1>Chart Simulation</h1>
+<label for="systemsCount">Systems Count: </label>
+<input type="number" id="systemsCount" value="500"><br>
+<label for="subIntervals">Sub-Intervals: </label>
+<input type="number" id="subIntervals" value="200"><br>
+<label for="lambda">Lambda: </label>
+<input type="number" id="lambda" value="20"><br>
+<button id="calculateButton">Calculate</button><br>
+
+<div class="container">
     <canvas id="chartCanvas" width="800" height="400"></canvas>
-    </div>
-    <script>
-        const chartCanvas = document.getElementById('chartCanvas');
-        const ctx = chartCanvas.getContext('2d');
-        const chartWidth = chartCanvas.width;
-        const chartHeight = chartCanvas.height;
-
-        const systemsCountInput = document.getElementById('systemsCount');
-        const subIntervalsInput = document.getElementById('subIntervals');
-        const lambdaInput = document.getElementById('lambda');
-        const calculateButton = document.getElementById('calculateButton');
-
-        let systemsCount = parseInt(systemsCountInput.value, 10);
-        let subIntervals = parseInt(subIntervalsInput.value, 10);
-        let lambda = parseFloat(lambdaInput.value);
-
-        calculateButton.addEventListener('click', () => {
-            systemsCount = parseInt(systemsCountInput.value, 10);
-            subIntervals = parseInt(subIntervalsInput.value, 10);
-            lambda = parseFloat(lambdaInput.value);
-            calculateScores();
-            draw();
-        });
-
-        let scaleX = 50;
-        let scaleY = 50;
-        let chartX = 0;
-        let chartY = 0;
-        let cartesianZoom = 1.0;
-
-        let drawingData = [];
-        let firstHalf = 0;
-        let secondHalf = 0;
-
-        function generateRandomColors(count) {
-            const randomColor = () => Math.floor(Math.random() * 256);
-            const colors = [];
-
-            for (let i = 0; i < count; i++) {
-                colors.push(`rgb(${randomColor()}, ${randomColor()}, ${randomColor()})`);
-            }
-
-            return colors;
-        }
-
-        let systemColors = generateRandomColors(systemsCount);
+</div>
+<script>
 
 
-        function calculateScores() {
-            drawingData = new Array(systemsCount).fill([]);
-            firstHalf = 0;
-            secondHalf = 0;
+    const chartCanvas = document.getElementById('chartCanvas');
+    const ctx = chartCanvas.getContext('2d');
+    const chartWidth = chartCanvas.width;
+    const chartHeight = chartCanvas.height;
 
-            for (let currentSystem = 0; currentSystem < systemsCount; currentSystem++) {
-                const systemData = [{ x: 0, y: 0 }];
-                drawingData[currentSystem] = systemData;
 
-                for (let subInterval = 1; subInterval <= subIntervals; subInterval++) {
-                    const successProbability = Math.random();
 
-                    if (successProbability > (lambda / subIntervals)) {
-                        if (subInterval <= subIntervals / 2) {
-                            firstHalf++;
-                            secondHalf++;
-                        } else {
-                            secondHalf++;
-                        }
-                        systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y });
-                        systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y + 1 });
-                    } else {
-                        systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y });
-                    }
-                }
-            }
-        }
+    const systemsCountInput = document.getElementById('systemsCount');
+    const subIntervalsInput = document.getElementById('subIntervals');
+    const lambdaInput = document.getElementById('lambda');
+    const calculateButton = document.getElementById('calculateButton');
 
-        function draw() {
-            ctx.clearRect(0, 0, chartWidth, chartHeight);
+    let systemsCount = parseInt(systemsCountInput.value, 10);
+    let subIntervals = parseInt(subIntervalsInput.value, 10);
+    let lambda = parseFloat(lambdaInput.value);
+    let systemColors = [];
 
-            const stepX = scaleX * cartesianZoom;
-            const stepY = scaleY * cartesianZoom;
-            const originX = chartX;
-            const originY = chartY;
-            const pointsCountX = Math.floor(chartWidth / stepX);
-            const pointsCountY = Math.floor(chartHeight / stepY);
-
-            ctx.beginPath();
-            ctx.moveTo(originX, chartHeight);
-            ctx.lineTo(chartWidth, chartHeight);
-            ctx.strokeStyle = 'black'
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(originX, originY);
-            ctx.lineTo(originX, chartHeight);
-            ctx.strokeStyle = 'black'
-            ctx.stroke();
-
-            for (let system = 0; system < systemsCount; system++) {
-                ctx.beginPath();
-
-                for (let point = 0; point < drawingData[system].length - 1; point++) {
-                    const startX = drawingData[system][point].x * scaleX * cartesianZoom + chartX;
-                    const startY = chartHeight - drawingData[system][point].y * scaleY * cartesianZoom;
-                    const endX = drawingData[system][point + 1].x * scaleX * cartesianZoom + chartX;
-                    const endY = chartHeight - drawingData[system][point + 1].y * scaleY * cartesianZoom;
-                    ctx.moveTo(startX, startY);
-                    ctx.lineTo(endX, endY);
-                }
-
-                ctx.strokeStyle = systemColors[system];
-                ctx.lineWidth = 3;
-                ctx.stroke();
-            }
-
-            drawHistograms();
-        }
-
-        function drawHistograms() {
-            const barWidth = 10.0 / 5.0 * scaleX * cartesianZoom;
-            const startXFirstSeries = (subIntervals / 2) * scaleX * cartesianZoom + chartX;
-            const startXSecondSeries = subIntervals * scaleX * cartesianZoom + chartX;
-            const initialY = chartHeight;
-            const normalizedFirstScore = firstHalf / systemsCount;
-            const normalizedSecondScore = secondHalf / systemsCount;
-            const initialHeight = 4 * scaleY * cartesianZoom;
-            const firstBarHeight = normalizedFirstScore * scaleY * cartesianZoom;
-            const secondBarHeight = normalizedSecondScore * scaleY * cartesianZoom;
-            const yFirstSeries = chartHeight - firstBarHeight;
-            const ySecondSeries = chartHeight - secondBarHeight;
-
-            ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-            ctx.fillRect(startXFirstSeries, yFirstSeries, barWidth, firstBarHeight);
-
-            ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
-            ctx.fillRect(startXSecondSeries, ySecondSeries, barWidth, secondBarHeight);
-
-            ctx.font = '16px Arial';
-            ctx.fillStyle = 'black';
-            ctx.fillText(firstHalf.toString(), startXFirstSeries + barWidth, yFirstSeries + firstBarHeight / 2);
-            ctx.fillText(secondHalf.toString(), startXSecondSeries + barWidth, ySecondSeries + secondBarHeight / 2);
-        }
-
+    calculateButton.addEventListener('click', () => {
+        systemsCount = parseInt(systemsCountInput.value, 10);
+        subIntervals = parseInt(subIntervalsInput.value, 10);
+        lambda = parseFloat(lambdaInput.value);
+        systemColors = generateRandomColorArray(systemsCount)
         calculateScores();
         draw();
+    });
+
+    let scaleX = 50;
+    let scaleY = 50;
+    let chartX = 0;
+    let chartY = 0;
+    cartesianZoom = 1.0;
+
+    let drawingData = [];
+    let firstHalf = 0;
+    let secondHalf = 0;
+    let scoresFirstHalf = 0;
+    let scoresSecondHalf = 0;
+    let scoresHalf = 0;
+    let scoresEnd = 0;
 
 
+
+    function generateRandomColor() {
+        // Generate a random number for the red channel (RR)
+        const red = Math.floor(Math.random() * 256);
+
+        // Generate a random number for the green channel (GG)
+        const green = Math.floor(Math.random() * 256);
+
+        // Generate a random number for the blue channel (BB)
+        const blue = Math.floor(Math.random() * 256);
+
+        // Compose the hexadecimal color
+        const color = `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`;
+
+        return color;
+    }
+
+    function generateRandomColorArray(numberOfColors) {
+        const randomColors = [];
+
+        for (let i = 0; i < numberOfColors; i++) {
+            const randomColor = generateRandomColor();
+            randomColors.push(randomColor);
+        }
+
+        return randomColors;
+    }
+
+
+
+
+    function calculateScores() {
+        drawingData = new Array(systemsCount).fill();
+        firstHalf = new Array(systemsCount).fill(0);
+        secondHalf = new Array(systemsCount).fill(0);
+        scoresFirstHalf = new Array(subIntervals).fill(0);
+        scoresSecondHalf = new Array(subIntervals).fill(0);
+
+
+        for (let currentSystem = 0; currentSystem < systemsCount; currentSystem++) {
+            const systemData = [{ x: 0, y: 0 }];
+            drawingData[currentSystem] = systemData;
+
+            for (let subInterval = 1; subInterval <= subIntervals; subInterval++) {
+                const successProbability = Math.random();
+
+                if (successProbability > (lambda / subIntervals)) {
+                    if (subInterval <= subIntervals / 2) {
+                        firstHalf[currentSystem]++;
+                        secondHalf[currentSystem]++;
+                    } else {
+                        secondHalf[currentSystem]++;
+
+                    }
+                    systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y });
+                    systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y + 1 });
+                } else {
+                    systemData.push({ x: subInterval, y: systemData[systemData.length - 1].y });
+                }
+            }
+        }
+
+        for (let subInterval = 1; subInterval <= subIntervals; subInterval++) {
+            for (let currentSystem = 0; currentSystem < systemsCount; currentSystem++) {
+                if (subInterval - 1 == firstHalf[currentSystem]) {
+                    scoresFirstHalf[subInterval - 1]++;
+                }
+                if (subInterval - 1 == secondHalf[currentSystem]) {
+                    scoresSecondHalf[subInterval - 1]++;
+                }
+            }
+        }
+        scoresHalf = scoresFirstHalf.filter(function (valore, indice, vett) {
+            return valore != 0;
+        });
+        scoresEnd = scoresSecondHalf.filter(function (valore, indice, vett) {
+            return valore != 0;
+        });
+    }
+
+    function draw() {
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const stepX = scaleX * cartesianZoom;
+        const stepY = scaleY * cartesianZoom;
+
+        const pointsCountX = Math.floor(chartWidth / stepX);
+        const pointsCountY = Math.floor(chartHeight / stepY);
+
+        const originX = chartX;
+        const originY = chartY;
+
+        for (let system = 0; system < systemsCount; system++) {
+            ctx.beginPath();
+
+            for (let point = 0; point < drawingData[system].length - 1; point++) {
+                const startX = drawingData[system][point].x * scaleX * cartesianZoom + chartX;
+                const startY = chartHeight - drawingData[system][point].y * scaleY * cartesianZoom;
+                const endX = drawingData[system][point + 1].x * scaleX * cartesianZoom + chartX;
+                const endY = chartHeight - drawingData[system][point + 1].y * scaleY * cartesianZoom;
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+            }
+
+            ctx.strokeStyle = systemColors[system];
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        drawHistograms();
+    }
+
+    function drawHistograms() {
+
+        const barWidth = systemsCount / subIntervals * scaleX * cartesianZoom;
+        const initialY = chartHeight;
+
+        ctx.fillStyle = 'rgba(255, 0, 255, 0.5)';
+        for (let i = 0; i < subIntervals / 2; i++) {
+
+            const barHeight = scoresHalf[i] * scaleY * 0.6 * cartesianZoom * 1 * subIntervals * 3 / systemsCount;
+            const x = (subIntervals / 2) * scaleX * cartesianZoom + chartX + i * barWidth;
+            const y = chartHeight - barHeight;
+            ctx.fillRect(x, y, barWidth, barHeight);
+
+
+        }
+
+        ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+        for (let i = 0; i < subIntervals; i++) {
+
+            const barHeight = scoresEnd[i] * scaleY * cartesianZoom * subIntervals / systemsCount * 3;
+            const x = (subIntervals) * scaleX * cartesianZoom + chartX + i * barWidth;
+            const y = chartHeight - barHeight;
+            ctx.fillRect(x, y, barWidth, barHeight);
+
+        }
+
+    }
+
+    calculateScores();
+    draw();
+
+</script>
+</body>
+
+<script>
+const container = document.querySelector('.container');
+const canvas = document.getElementById('chartCanvas');
+const context = canvas.getContext('2d');
+
+let isResizing = false;
+
+container.addEventListener('mousedown', (e) => {
+    if (e.target === container) {
+        isResizing = true;
+        initialX = e.clientX - container.offsetWidth;
+    }
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    container.style.width = (e.clientX - initialX) + 'px';
+    canvas.width = container.offsetWidth;
+    // Aggiorna il contenuto del canvas se necessario
+    draw();  // Chiamata per disegnare il contenuto del canvas dopo il ridimensionamento
+});
+
+document.addEventListener('mouseup', () => {
+    isResizing = false;
+});
+
+const zoomStep = 0.1;  // Incremento/decremento della scala ad ogni passo di zoom
+
+function handleZoom(event) {
+    const zoomCenterX = 0;  // Usa la posizione x dell'angolo in basso a sinistra come centro x
+    const zoomCenterY = canvas.height;  // Usa la posizione y dell'angolo in basso a sinistra come centro y
+
+    if (event.deltaY < 0) {
+        // Zoom in quando scrolli verso l'alto
+        cartesianZoom += zoomStep;
+    } else {
+        // Zoom out quando scrolli verso il basso
+        cartesianZoom -= zoomStep;
+    }
+
+    // Impedisci che la scala diventi troppo piccola o troppo grande
+    cartesianZoom = Math.min(Math.max(cartesianZoom, 0.1), 3.0);
+
+    // Cancella il canvas e ridisegna con la nuova scala
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.save();
+    context.translate(zoomCenterX, zoomCenterY);
+    context.scale(cartesianZoom, cartesianZoom);
+    context.translate(-zoomCenterX, -zoomCenterY);
+    draw();  // Chiamata alla tua funzione di disegno
+    context.restore();
+}
+
+document.addEventListener('wheel', handleZoom);
+</script>
     </script>
 
     <p>Same but in c#</p>
