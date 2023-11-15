@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chart Simulation</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+
+        /* Stile generale per il body e l'html */
+        body,
+        html {
+            height: 100%;
+            margin: 20px;
+        }
+
+        /* Stile per i contenitori dei grafici */
+        .container {
+            width: 50%;
+            /* Imposta la larghezza iniziale del contenitore */
+            padding: 20px;
+            border: 1px solid #000;
+            resize: both;
+            overflow: auto;
+            margin: 20px auto;
+            /* Centra il contenitore e aggiunge spazio tra di essi */
+        }
+
+        /* Stile per il canvas (grafico) all'interno del contenitore */
+        canvas {
+            width: 100%;
+            /* Il canvas riempirà sempre il contenitore */
+            height: 100%;
+            border: 1px solid #000;
+            display: block;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>Chart Simulation</h1>
+    <br>
+    <label for="attacksCount">Number of Attacks:</label>
+    <input type="number" id="attacksCount" value="300">
+    <br>
+    <label for="systemsCount">Number of Systems:</label>
+    <input type="number" id="systemsCount" value="80">
+    <br>
+    <label for="securityScore">Security Score:</label>
+    <input type="number" id="securityScore" value="100">
+    <br>
+    <label for="penetrationScore">Penetration Score:</label>
+    <input type="number" id="penetrationScore" value="80">
+    <br>
+    <button id="calculateButton">Calculate</button><br>
+
+    <div class="container">
+        <canvas id="chartCanvas" width="1500" height="500"></canvas>
+    </div>
+    <script>
+
+
+        const chartCanvas = document.getElementById('chartCanvas');
+        const ctx = chartCanvas.getContext('2d');
+        const chartWidth = chartCanvas.width;
+        const chartHeight = chartCanvas.height;
+
+
+        const attacksCountInput = document.getElementById('attacksCount');
+        const systemsCountInput = document.getElementById('systemsCount');
+        const securityScoreInput = document.getElementById('securityScore');
+        const penetrationScoreInput = document.getElementById('penetrationScore');
+        const calculateButton = document.getElementById('calculateButton');
+
+        let systemsCount = parseInt(systemsCountInput.value, 10);
+        let attacksCount = parseInt(attacksCountInput.value, 10);
+        let securityScore = parseInt(securityScoreInput.value, 10);
+        let penetrationScore = parseInt(penetrationScoreInput.value, 10);
+        let systemColors = generateRandomColorArray(systemsCount);
+
+        calculateButton.addEventListener('click', () => {
+            systemsCount = parseInt(systemsCountInput.value, 10);
+            attacksCount = parseInt(attacksCountInput.value, 10);
+            securityScore = parseInt(securityScoreInput.value, 10);
+            penetrationScore = parseInt(penetrationScoreInput.value, 10);
+            systemColors = generateRandomColorArray(systemsCount)
+            calculateScores();
+            draw();
+        });
+
+        let scaleX = 50;
+        let scaleY = 50;
+        let chartX = 0;
+        let chartY = -attacksCount*2;
+        cartesianZoom = 1.0;
+
+        let drawingData = [];
+
+        let reached = 0;
+        let discardedFirstHalf = 0;
+        let discardedSecondHalf = 0;
+
+
+
+        function generateRandomColor() {
+            // Generate a random number for the red channel (RR)
+            const red = Math.floor(Math.random() * 256);
+
+            // Generate a random number for the green channel (GG)
+            const green = Math.floor(Math.random() * 256);
+
+            // Generate a random number for the blue channel (BB)
+            const blue = Math.floor(Math.random() * 256);
+
+            // Compose the hexadecimal color
+           const color = `#${red.toString(16)}${green.toString(16)}${blue.toString(16)}`;
+
+            return color;
+        }
+
+        function generateRandomColorArray(numberOfColors) {
+            const randomColors = [];
+
+            for (let i = 0; i < numberOfColors; i++) {
+                const randomColor = generateRandomColor();
+                randomColors.push(randomColor);
+            }
+            return randomColors;
+        }
+
+        function calculateScores() {
+            securityScores = new Array(systemsCount).fill(0);
+            penetrationScores = new Array(systemsCount).fill(0);
+            reached = new Array(systemsCount).fill(0);
+            discardedFirstHalf = new Array(attacksCount).fill(0);
+            discardedSecondHalf = new Array(attacksCount).fill(0);
+            drawingData = new Array(systemsCount).fill();
+
+            for (let att = 1; att <= attacksCount; att++) {
+                discardedFirstHalf[att] = 0;
+                discardedSecondHalf[att] = 0;
+            }
+
+            for (let currentSystem = 0; currentSystem < systemsCount; currentSystem++) {
+                systemData = [{ x: 0, y: 4 }];
+                drawingData[currentSystem] = [...systemData];
+
+                securityScores[currentSystem] = 0;
+                penetrationScores[currentSystem] = 0;
+                reached[currentSystem] = false;
+
+                for (let attack = 1; attack <= attacksCount; attack++) {
+                    const successProbability = Math.random();
+
+                    if (successProbability > 0.5) {
+                        penetrationScores[currentSystem]++;
+                        const precY = drawingData[currentSystem][drawingData[currentSystem].length - 1].y;
+                        drawingData[currentSystem].push({ x: attack, y: precY + 1 });
+                    } else {
+                        securityScores[currentSystem]++;
+                        const precY = drawingData[currentSystem][drawingData[currentSystem].length - 1].y;
+                        drawingData[currentSystem].push({ x: attack, y: precY - 1 });
+                    }
+
+                    if (securityScores[currentSystem] === securityScore) {
+                        reached[currentSystem] = true;
+                    }
+
+                    if (!reached[currentSystem] && penetrationScores[currentSystem] === penetrationScore) {
+                        if (attack <= attacksCount / 2) {
+                            discardedFirstHalf[attack]++;
+                            discardedSecondHalf[attack]++;
+                        } else {
+                            discardedSecondHalf[attack]++;
+                        }
+                    }
+                }
+            }
+            discardedFirstHalf = discardedFirstHalf.filter(function (valore, indice, vett) {
+                return valore != 0;
+            });
+            discardedSecondHalf = discardedSecondHalf.filter(function (valore, indice, vett) {
+                return valore != 0;
+            });
+        }
+
+        function draw() {
+
+            ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+
+            const stepX = scaleX * cartesianZoom;
+            const stepY = scaleY * cartesianZoom;
+
+            const pointsCountX = Math.floor(chartWidth / stepX);
+            const pointsCountY = Math.floor(chartHeight / stepY);
+
+            const originX = chartX;
+            const originY = chartY;
+
+            for (let system = 0; system < systemsCount; system++) {
+                ctx.beginPath();
+
+                for (let point = 0; point < drawingData[system].length - 1; point++) {
+                    const startX = drawingData[system][point].x * scaleX * cartesianZoom + chartX;
+                    const startY = chartHeight - drawingData[system][point].y * scaleY * cartesianZoom + chartY;
+                    const endX = drawingData[system][point + 1].x * scaleX * cartesianZoom + chartX;
+                    const endY = chartHeight - drawingData[system][point + 1].y * scaleY * cartesianZoom + chartY;
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                }
+
+                ctx.strokeStyle = systemColors[system];
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            drawHistograms();
+        }
+
+        function drawHistograms() {
+
+            const barWidth = attacksCount / (5 * systemsCount) * scaleX * cartesianZoom;
+            const initialY = chartHeight;
+
+            ctx.fillStyle = 'rgba(255, 0, 255, 0.8)';
+            for (let i = 0; i < attacksCount / 2; i++) {
+                const barHeight = discardedFirstHalf[i] * scaleY * attacksCount / systemsCount * cartesianZoom;
+                const x = (attacksCount / 2) * scaleX * cartesianZoom + chartX + i * barWidth;
+                const y = initialY + chartY - barHeight;
+                ctx.fillRect(x, y, barWidth, barHeight);
+
+
+            }
+
+            ctx.fillStyle = 'rgba(0, 0, 255, 0.8)';
+            for (let i = 0; i < attacksCount; i++) {
+                const barHeight = discardedSecondHalf[i] * scaleY * attacksCount / systemsCount * cartesianZoom;
+                const x = (attacksCount) * scaleX * cartesianZoom + chartX + i * barWidth;
+                const y = initialY + chartY - barHeight;
+                ctx.fillRect(x, y, barWidth, barHeight);
+
+            }
+
+        }
+
+        calculateScores();
+        draw();
+
+    </script>
+    <p >Same exercise but in c#</p>
+    <pre>
+      <code>
+        using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Media;
+using System.Windows.Forms;
+using static System.Formats.Asn1.AsnWriter;
+using Timer = System.Windows.Forms.Timer;
+
+public class SecurityScoreChart
+{
+
+    private int attacksCount; // Numero di attacchi.
+    public int chartWidth; // Larghezza del grafico.
+    public int chartHeight; // Altezza del grafico.
+    public int chartX; // Posizione X del grafico all'interno del rettangolo rosso.
+    public int chartY; // Posizione Y del grafico all'interno del rettangolo rosso.
+    private float scaleX = 100; // Fattore di scala per adattare il grafico alle dimensioni del rettangolo rosso.
+    private float scaleY = 100;
+    private PictureBox pictureBox; // Riferimento al PictureBox su cui disegnare il grafico.
+    private int systemsCount;
+    private Bitmap chartbitmap;
+    private ResizableRect redRect;
+    private Region clipRegion;
+    List<List<Tuple<int, int>>> drawingData;
+    List<Tuple<int, int>> systemData;
+    List<int> securityScores;
+    List<int> penetrationScores;
+    List<bool> reached;
+    List<int> discardedFirstHalf;
+    List<int> discardedSecondHalf;
+    private int redRectX;
+    private int redRectY;
+    public int redRectTop;
+    private int redRectHeight;
+    private float cartesianZoom = 1.0f;
+    public List<Color> systemColors;
+    private int centerY;
+    private int centerX;
+    private int securityScore;
+    private int penetrationScore;
+
+    public SecurityScoreChart(int attacksCount, int chartWidth, int chartHeight, int chartX, int chartY, int systemsCount, Bitmap chartbitmap, ResizableRect redRect, List<Color> systemColors)
+    {
+        this.attacksCount = attacksCount;
+        this.chartWidth = chartWidth;
+        this.chartHeight = chartHeight;
+        this.chartX = chartX;
+        this.chartY = chartY;
+        this.chartbitmap = chartbitmap;
+        this.systemsCount = systemsCount; // Inizializza il numero di sistemi.
+        this.redRect = redRect;
+        this.systemColors = systemColors;
+        redRectX = redRect.Rectangle.X;
+        redRectY = redRect.Rectangle.Y;
+        redRectHeight = redRect.Rectangle.Height;
+
+        CalculateScores();
+
+    }
+
+
+
+    public void SetPictureBox(PictureBox pictureBox)
+    {
+        this.pictureBox = pictureBox;
+    }
+
+    public PictureBox GetPictureBox()
+    {
+        return this.pictureBox;
+    }
+
+    public void CalculateScores()
+    {
+        Random random = new Random();
+        securityScores = new List<int>(systemsCount);
+        penetrationScores = new List<int>(systemsCount);
+        reached = new List<bool>(systemsCount);
+        discardedFirstHalf = new List<int>(attacksCount);
+        discardedSecondHalf = new List<int>(attacksCount);
+        drawingData = new List<List<Tuple<int, int>>>(systemsCount);
+        discardedFirstHalf.Add(0);
+        discardedSecondHalf.Add(0);
+
+        for (int att = 1; att<=attacksCount; att++)
+        {
+            discardedFirstHalf.Add(0);
+            discardedSecondHalf.Add(0);
+        }
+        
+
+        for (int currentSystem = 0; currentSystem < systemsCount; currentSystem++)
+        {
+            systemData = new List<Tuple<int, int>>();
+            systemData.Add(new Tuple<int, int>(0, 4));
+            drawingData.Add(systemData);
+
+            securityScores.Add(0);
+            penetrationScores.Add(0);
+            reached.Add(false);
+
+
+            for (int attack = 1; attack <= attacksCount; attack++)
+            {
+              
+                double successProbability = random.NextDouble();
+
+                // Calcola l'esito dell'attacco e aggiorna il punteggio.
+                if (successProbability > 0.5)
+                {
+                    penetrationScores[currentSystem]++;
+                    int precY = drawingData[currentSystem].Last().Item2;
+                    drawingData[currentSystem].Add(new Tuple<int, int>(attack, precY + 1));
+                }
+                else
+                {
+                    securityScores[currentSystem]++;
+                    int precY = drawingData[currentSystem].Last().Item2;
+                    drawingData[currentSystem].Add(new Tuple<int, int>(attack, precY - 1));
+                }
+
+                if (securityScores[currentSystem] == securityScore)
+                {
+                    reached[currentSystem] = true;
+                }
+
+                if (reached[currentSystem] == false && penetrationScores[currentSystem] == penetrationScore)
+                {
+                    if (attack <= attacksCount / 2)
+                    {
+                        discardedFirstHalf[attack]++;
+                        discardedSecondHalf[attack]++;
+                    } else
+                    {
+                        discardedSecondHalf[attack]++;
+                    }
+                    
+                }
+            }
+        }
+    }
+
+    public void DrawLines(Graphics graphics)
+    {
+        int startX;
+        int startY;
+        int endX;
+        int endY;
+        int thickness = systemsCount;
+
+        // Distanza tra i punti sulle ascisse e le ordinate
+        float stepX = 1 * scaleX * cartesianZoom; // Distanza tra i punti sull'asse x
+        float stepY = 1 * scaleY * cartesianZoom; // Distanza tra i punti sull'asse y
+
+        // Calcola l'origine del piano in base al fattore di zoom
+        float originX = chartX + 0;  // Origine x (non spostato)
+        float originY = chartY + 6 * scaleY * cartesianZoom; // Origine y (spostato di 6 e considerando lo zoom)
+
+        // Calcola il numero di punti lungo le ascisse e le ordinate in base alle dimensioni del rettangolo rosso
+        int pointsCountX = (int)(redRect.Rectangle.Width / stepX);
+        int pointsCountY = (int)(redRect.Rectangle.Height / stepY);
+
+        // Disegna la griglia
+
+        for (int i = -pointsCountX; i <= pointsCountX; i++)
+        {
+            float x = i * stepX + originX;
+            int textX = (int)x;
+            int textY = (int)redRect.Rectangle.Bottom + 2;
+
+            string numberX = (i).ToString();  // Usa i come numero progressivo
+            SizeF textSizeX = graphics.MeasureString(numberX, SystemFonts.DefaultFont);
+            PointF textLocationX = new PointF(x, chartY + 4 * scaleY * cartesianZoom);
+
+            graphics.DrawLine(new Pen(Color.Gray, 1), new Point((int)x, (int)redRect.Rectangle.Top), new Point((int)x, (int)redRect.Rectangle.Bottom));
+            graphics.DrawString(numberX, SystemFonts.DefaultFont, Brushes.Black, textLocationX);
+        }
+
+        for (int i = -pointsCountY; i <= pointsCountY; i++)
+        {
+            float y = i * stepY + originY;
+
+            // Linee orizzontali
+            graphics.DrawLine(new Pen(Color.Gray, 1), new Point((int)redRect.Rectangle.Left, (int)y), new Point((int)redRect.Rectangle.Right, (int)y));
+        }
+
+        for (int system = 0; system < systemsCount; system++)
+        {
+            for (int point = 0; point < drawingData[system].Count - 1; point++)
+            {
+
+                startX = (int)(drawingData[system][point].Item1 * scaleX * cartesianZoom) + chartX;
+                startY = (int)(drawingData[system][point].Item2 * scaleY * cartesianZoom) + chartY;
+                endX = (int)(drawingData[system][point + 1].Item1 * scaleX * cartesianZoom) + chartX;
+                endY = (int)(drawingData[system][point + 1].Item2 * scaleY * cartesianZoom) + chartY;
+
+                // Disegna solo se il grafico è visibile
+                graphics.DrawEllipse(new Pen(Color.Green, 2), startX, startY, 4, 4);
+                graphics.DrawEllipse(new Pen(Color.Green, 2), endX, endY, 4, 4);
+                graphics.DrawLine(new Pen(systemColors[system], 3), new Point(startX, startY), new Point(endX, endY));
+            }
+        }
+    }
+
+    public void DrawHistograms(Graphics graphics)
+    {
+        float barWidth = 10.0f * cartesianZoom;
+        float barSpacing = 1.0f * cartesianZoom;
+
+        float anchorXFirstSeries = (attacksCount / 2) * scaleX * cartesianZoom;
+        float anchorXSecondSeries = attacksCount * scaleX * cartesianZoom;
+
+        // Calcola la posizione iniziale della prima serie (ancorata a "numero di attacchi / 2")
+        float startXFirstSeries = anchorXFirstSeries - (barWidth * attacksCount / 2);
+
+        // Calcola la posizione iniziale della seconda serie (ancorata a "numero di attacchi")
+        float startXSecondSeries = anchorXSecondSeries - (barWidth * attacksCount / 2);
+
+        float initialY = chartY + 4 * scaleY * cartesianZoom;  // Posizione iniziale delle barre
+
+
+
+        for (int att = 1; att <= attacksCount; att++)
+        {
+            float xFirstSeries = startXFirstSeries + att * (barWidth + barSpacing);
+            float xSecondSeries = startXSecondSeries + att * (barWidth + barSpacing);
+
+            if (att < discardedFirstHalf.Count)
+            {
+                int firstScore = discardedFirstHalf[att];
+                float normalizedFirstScore = (float)firstScore / 3.0f;
+                float firstBarHeight = normalizedFirstScore * scaleY;
+                float yFirstSeries = initialY - firstBarHeight;
+
+                RectangleF barFirstSeries = new RectangleF(xFirstSeries, yFirstSeries, barWidth, firstBarHeight);
+                graphics.FillRectangle(new SolidBrush(Color.Blue), barFirstSeries);
+            }
+
+            if (att < discardedSecondHalf.Count)
+            {
+                int secondScore = discardedSecondHalf[att];
+                float normalizedSecondScore = (float)secondScore / 3.0f;
+                float secondBarHeight = normalizedSecondScore * scaleY;
+                float ySecondSeries = initialY - secondBarHeight;
+
+                RectangleF barSecondSeries = new RectangleF(xSecondSeries, ySecondSeries, barWidth, secondBarHeight);
+                graphics.FillRectangle(new SolidBrush(Color.Green), barSecondSeries);
+            }
+        }
+    }
+
+
+
+
+    public void Draw()
+    {
+        using (Graphics graphics = Graphics.FromImage(chartbitmap))
+        {
+            // Calcola la regione di clipping basata sul resizableRect rosso
+            clipRegion = new Region(redRect.Rectangle);
+            graphics.SetClip(clipRegion, CombineMode.Intersect);
+
+            centerX = redRect.Rectangle.Left + redRect.Rectangle.Width / 2;
+            chartX = centerX - chartWidth / 2;
+
+            int desiredDistanceFromBottom = 80; // Regola questa distanza come desideri
+
+            centerY = redRect.Rectangle.Bottom - desiredDistanceFromBottom;
+            chartY = centerY - chartHeight / 6;
+
+
+            DrawHistograms(graphics);
+            DrawLines(graphics);
+
+        }
+        pictureBox.Invalidate();
+    }
+
+
+
+    internal Image GetChartBitmap()
+    {
+        return this.chartbitmap;
+    }
+
+    public void SetCartesianZoom(float zoomFactor)
+    {
+        cartesianZoom = zoomFactor;
+    }
+
+    public float GetCartesianZoom()
+    {
+        return this.cartesianZoom;
+    }
+
+    public void Zoom(float zoomFactor)
+    {
+        // Aggiorna il fattore di scala
+        scaleX *= zoomFactor;
+        scaleY *= zoomFactor;
+
+        SetCartesianZoom(cartesianZoom * zoomFactor);
+
+        // Ricalcola il disegno del grafico
+        Draw();
+    }
+
+    public static Color GetRandomColor()
+    {
+        Random random = new Random();
+        return Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
+    }
+
+    public List<List<Tuple<int, int>>> GetDrawingData()
+    {
+        return this.drawingData;
+    }
+
+    public List<Color> GetSystemColors()
+    {
+        return this.systemColors;
+    }
+
+    public void SetSystemsCount(int systemsCount)
+    {
+        this.systemsCount = systemsCount;
+    }
+
+    public void SetAttacksCount(int numberOfAttacks)
+    {
+        this.attacksCount = numberOfAttacks;
+    }
+
+    public void SetSecurityScore(int securityScore)
+    {
+        this.securityScore = securityScore;
+    }
+
+    public void SetPenetrationScore(int penetrationScore)
+    {
+        this.penetrationScore = penetrationScore;
+    }
+
+    public void SetSystemColor(List<Color> systemColors)
+    {
+        this.systemColors = systemColors;
+    }
+}
+      </code>
+    </pre>
+</body>
+
+<script>
+    const container = document.querySelector('.container');
+    const canvas = document.getElementById('chartCanvas');
+    const context = canvas.getContext('2d');
+
+    let isResizing = false;
+
+    container.addEventListener('mousedown', (e) => {
+        if (e.target === container) {
+            isResizing = true;
+            initialX = e.clientX - container.offsetWidth;
+        }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        container.style.width = (e.clientX - initialX) + 'px';
+        canvas.width = container.offsetWidth;
+        // Aggiorna il contenuto del canvas se necessario
+        draw();  // Chiamata per disegnare il contenuto del canvas dopo il ridimensionamento
+    });
+
+    document.addEventListener('mouseup', () => {
+        isResizing = false;
+    });
+
+    const zoomStep = 0.05;  // Incremento/decremento della scala ad ogni passo di zoom
+
+    function handleZoom(event) {
+        const zoomCenterX = 0;  // Usa la posizione x dell'angolo in basso a sinistra come centro x
+        const zoomCenterY = canvas.height;  // Usa la posizione y dell'angolo in basso a sinistra come centro y
+
+        if (event.deltaY < 0) {
+            // Zoom in quando scrolli verso l'alto
+            cartesianZoom += zoomStep;
+        } else {
+            // Zoom out quando scrolli verso il basso
+            cartesianZoom -= zoomStep;
+        }
+
+        // Impedisci che la scala diventi troppo piccola o troppo grande
+        cartesianZoom = Math.min(Math.max(cartesianZoom, 0.1), 3.0);
+
+        // Cancella il canvas e ridisegna con la nuova scala
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.save();
+        context.translate(zoomCenterX, zoomCenterY);
+        context.scale(cartesianZoom, cartesianZoom);
+        context.translate(-zoomCenterX, -zoomCenterY);
+        draw();  // Chiamata alla tua funzione di disegno
+        context.restore();
+    }
+
+    document.addEventListener('wheel', handleZoom);
+</script>
+
+</html>
