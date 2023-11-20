@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gambler's Ruin Problem</title>
+  <!-- Bootstrap CSS link -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Custom styles */
+    .description,
+    .bibliography {
+      margin-bottom: 20px;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Gambler's Ruin Problem</h1>
+    
+    <div class="description">
+      <h2>Description of Gambler's Ruin Problem</h2>
+      <!-- Space for description of the Gambler's Ruin problem -->
+      <p>
+        The Gambler's Ruin problem is a famous concept in probability theory. A persistent gambler who constantly raises his bet to a fixed fraction every time he loses will eventually go 
+        broke in a finite amount of bets. This problem is often modelled with a <a href="https://en.wikipedia.org/wiki/Random_walk">random walk</a> . In this model, the gambler will 
+        return to the point of origin of the walk. In simple terms will go broke.
+      </p>
+      <p class="h3">Reasons for the results</p>
+      <p>
+        In a fair game let <span class="mathjax-expression">\(d\)</span> be the amount of money that a gambler has at disposal at the beginning of the game. If he raises the bet of 
+        <span class="mathjax-expression">\(\frac{d}{N}\)</span> every time he wins but does not reduce it when he loses, it will take at most N bets to end bankrupt, however big N is.
+        By playing a fair game (let's say a toss coin), the gambler has chance of winning of <span class="mathjax-expression">\(\frac{1}{2}\)</span> on the first bet. And by simmetry the same chance
+        of going broke. If he repeats the process, he has the same <span class="mathjax-expression">\(\frac{1}{2}\)</span> chance of going broke. Hence at the second process he has chance of
+        <span class="mathjax-expression">\((\frac{1}{2})^2 = \frac{1}{4}\)</span> chance of not going broke. This process repeats for N times. Then we will have
+        <div class="mathjax-expression" style="font-size: larger;">    
+            \(\sum_{i = 1}^{N} (\frac{1}{2})^i\)
+        </div>
+        chance that he goes broke which approaches 1.
+      </p>
+      <p class="h3">Relation with practical homework</p>
+      <p>
+        An application of this model could be the unfair coin toss: Suppose we have a finite amount of nickles and a coin. At every toss of the coin the player can either win 
+        with a probability of <span class="mathjax-expression">\(p\)</span> or win with a probability of <span class="mathjax-expression">\(q = 1 - p\)</span>. In this case we used the model of the gambler and the coin
+        but <a href="https://zionick1.github.io/nickstatistics.github.io/hw6/hw6.html">homework six</a> can model these two actors as the server (the gambler) and the coin toss (the probability that an attack can happen or not with a fixed probability). In my case I used 
+        <span class="mathjax-expression">\(p = q\)</span> so we can consider it a fair game. Anyway the problem of a fair coin toss is discussed in the previous section of this paper.
+      </p>
+    </div>
+
+    <div class="bibliography">
+      <h2>Bibliography</h2>
+      <!-- Space for bibliography -->
+      <ul class="list-group">
+        <li class="list-group-item"><a href="https://en.wikipedia.org/wiki/Gambler%27s_ruin">Wikipedia's page about gambler's ruin problem </a></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Process math expressions with MathJax
+    document.addEventListener("DOMContentLoaded", function() {
+      const mathElements = document.querySelectorAll('.mathjax-expression');
+
+      mathElements.forEach(element => {
+        MathJax.typeset([element]);
+      });
+    });
+  </script>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
