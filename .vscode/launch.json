@@ -12,6 +12,13 @@
             "file": "${workspaceFolder}/hw5/hw5.html"
         },
         {
+            "type": "firefox",
+            "request": "launch",
+            "reAttach": true,
+            "name": "Launch hw7.html",
+            "file": "${workspaceFolder}/hw7/hw7.html"
+        },
+        {
             "name": "Launch index.html",
             "type": "firefox",
             "request": "launch",

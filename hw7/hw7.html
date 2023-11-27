@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stochastic Process Explorer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-dark bg-dark">
+            <span class="navbar-brand mb-0 h1">Stochastic Process Explorer</span>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="processSelect">Select a Stochastic Process:</label>
+                    <select id="processSelect" class="form-control">
+                        <option value="geometricBrownianMotion">Geometric Brownian Motion</option>
+                        <option value="arithmeticBrownianMotion">Arithmetic Brownian Motion</option>
+                        <option value="hullWhite">Hull - White</option>
+                        <option value="coxIngellRoss">Cox-Ingell-Ross</option>
+                        <!-- Add more options for other stochastic processes -->
+                    </select>
+                </div>
+                <button id="exploreBtn" class="btn btn-primary">Explore</button>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <canvas id="visualization" width="1000" height="500"></canvas>
+            </div>
+            <div id="theoryAll">
+                <div id="theoryGBM" style="display: none;">
+                    <p class="lead">The Geometric Brownian Process</p>
+                    <p>
+                        The geometric brownian motion  is a continuous-time stochastic process in which the logarithm of the randomly varying quantity follows a Brownian motion which is 
+                        the random motion of particles suspended in a medium. The SDE that GBM satisfies is:
+                        <div class="Math">
+                            \[
+                            dS_t= \mu S_t dt + \sigma S_t dW(t)
+                            \]
+                        </div>
+                        Where: 
+                        <ul >
+                            <li><span class="Math">\(W_t\)</span> is a <a href="https://en.wikipedia.org/wiki/Wiener_process">Wiener process</a></li>
+                            <li><span class="Math">\(\mu\)</span> is a constant that indicates the percentage drift</li>
+                            <li><span class="Math">\(\sigma\)</span> is a constant that indicates the percentage volatility</li>
+                        </ul>
+                        the first addend is used to calculate and model deterministic trends while the second one tries to model non deterministic and unpredictable events during the process.
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        const canva = document.getElementById('visualization');
+        const ctx = canva.getContext('2d');
+       
+        // Define functions to simulate stochastic processes
+        function simulateGeometricBrownianMotion() {
+            console.log('starting simulation');
+            const mu = 1;
+            const n = 50;
+            const dt = 0.1;
+            const x0 = 100;
+            const seed = 1;
+
+            const sigma = [];
+            for (let s = 0.8; s < 2; s += 0.2) {
+                sigma.push(s);
+            }
+            console.log(`sigma = ${sigma}`);
+
+            const width = canva.width;
+            const height = canva.height;
+            console.log(`height = ${height}, width = ${width}`);
+            for (let i = 0; i < sigma.length; i++) {
+                let path = [x0];
+                console.log(`x0 = ${x0}`);
+                for (let j = 0; j < n; j++) {
+                    const randomNormal = Math.random(); //thanks to CLT we know that our distribution will approximate a gaussian one with larger n. (to keep in mind anyway is that having larger n means more time for computation and also that we can't have true randomness in a general purpose pc).
+                    //actually calculating the numerical value using the solution formula for geometric brownian motion
+                    const increment = Math.exp((mu - Math.pow(sigma[i], 2) / 2) * dt + sigma[i] * randomNormal);
+                    const newValue = path[path.length - 1] * increment; //incrementing the path based on the last computed value
+
+                    const lastX = (j / n) * width;
+                    const lastY = height - (newValue / x0);
+                    
+
+                    path.push(newValue); //pushing the new value in the path
+
+                    if(j === 0){
+                        ctx.moveTo(0, height);
+                    }
+                    ctx.lineTo(lastX, lastY);
+                }
+                ctx.stroke();
+            }
+
+        }
+
+        function simulateArithmeticBrownianMotion() {
+
+        }
+
+        // Get references to HTML elements
+        const processSelect = document.getElementById('processSelect');
+        const exploreBtn = document.getElementById('exploreBtn');
+        const visualization = document.getElementById('visualization').getContext('2d');
+
+        // Function to handle exploration based on user selection
+        function exploreStochasticProcess() {
+            const selectedProcess = processSelect.value;
+
+            // Clear previous visualizations
+            visualization.clearRect(0, 0, visualization.canvas.width, visualization.canvas.height);
+
+            // Simulate and display the selected stochastic process
+            switch (selectedProcess) {
+                case 'geometricBrownianMotion':
+                    simulateGeometricBrownianMotion();
+                    const theoryGBM = document.getElementById('theoryGBM');
+                    if(theoryGBM.style.display === "none"){
+                        theoryGBM.style.display = "block";
+                    } 
+                    break;
+                case 'brownianMotion':
+                    simulateArithmeticBrownianMotion();
+                    break;
+                // Add cases for other stochastic processes
+                default:
+                    // Handle invalid selection
+                    break;
+            }
+        }
+
+        // Event listener for the explore button
+        exploreBtn.addEventListener('click', exploreStochasticProcess);
+
+        function renderMath() {
+            MathJax.typesetPromise([
+                document.getElementsByClassName('Math')
+            ]);
+        }
+
+        // Check if MathJax is loaded, then render equations
+        if (window.MathJax) {
+            renderMath();
+        } else {
+            window.addEventListener('load', renderMath);
+        }
+    </script>
+</body>
+</html>
