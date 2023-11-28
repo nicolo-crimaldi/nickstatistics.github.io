@@ -28,26 +28,12 @@
                         <!-- Add more options for other stochastic processes -->
                     </select>
                 </div>
-                <button id="exploreBtn" class="btn btn-primary">Simulate</button>
+                <button id="exploreBtn" class="btn btn-primary">Explore</button>
             </div>
         </div>
 
         <div class="row mt-4">
             <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <p class="lead">Insert the variables:</p>
-                            <label for="n">Insert the systems number</label>
-                            <input type="number" id="n">
-                            <label for="days">Insert the number of days</label>
-                            <input type="number" id="mu">
-                            <label for="mu">Insert the <span class="Math">\(\mu\)</span> value</label>
-                            <input type="number" id="mu">
-                        </div>
-                        <button id="exploreBtn" class="btn btn-primary">Simulate</button>
-                    </div>
-                </div>
                 <canvas id="visualization" width="1000" height="500"></canvas>
             </div>
             <div id="theoryAll">
@@ -55,7 +41,7 @@
                     <p class="lead">The Geometric Brownian Process</p>
                     <p>
                         The geometric brownian motion  is a continuous-time stochastic process in which the logarithm of the randomly varying quantity follows a Brownian motion which is 
-                        the random motion of particles suspended in a medium. The SDE that defines GBM is:
+                        the random motion of particles suspended in a medium. The SDE that GBM satisfies is:
                         <div class="Math">
                             \[
                             dS_t= \mu S_t dt + \sigma S_t dW(t)
@@ -69,10 +55,6 @@
                         </ul>
                         the first addend is used to calculate and model deterministic trends while the second one tries to model non deterministic and unpredictable events during the process.
                     </p>
-                    <p>
-
-                    </p>
-                    <p></p>
                 </div>
             </div>
             
@@ -91,9 +73,9 @@
         function simulateGeometricBrownianMotion() {
             console.log('starting simulation');
             const mu = 1;
-            const n = parseInt(document.getElementById('n').innerText);
+            const n = 50;
             const dt = 0.1;
-            const x0 = 0;
+            const x0 = 100;
             const seed = 1;
 
             const sigma = [];
