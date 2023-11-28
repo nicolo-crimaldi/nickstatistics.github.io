@@ -73,7 +73,7 @@
         function simulateGeometricBrownianMotion() {
             console.log('starting simulation');
             const mu = 1;
-            const n = 50;
+            const n = 100;
             const dt = 0.1;
             const x0 = 100;
             const seed = 1;
@@ -91,7 +91,7 @@
                 let path = [x0];
                 console.log(`x0 = ${x0}`);
                 for (let j = 0; j < n; j++) {
-                    const randomNormal = Math.random(); //thanks to CLT we know that our distribution will approximate a gaussian one with larger n. (to keep in mind anyway is that having larger n means more time for computation and also that we can't have true randomness in a general purpose pc).
+                    const randomNormal = standardNormalDistribution(); //thanks to CLT we know that our distribution will approximate a gaussian one with larger n. (to keep in mind anyway is that having larger n means more time for computation and also that we can't have true randomness in a general purpose pc).
                     //actually calculating the numerical value using the solution formula for geometric brownian motion
                     const increment = Math.exp((mu - Math.pow(sigma[i], 2) / 2) * dt + sigma[i] * randomNormal);
                     const newValue = path[path.length - 1] * increment; //incrementing the path based on the last computed value
@@ -114,6 +114,13 @@
 
         function simulateArithmeticBrownianMotion() {
 
+        }
+
+        function standardNormalDistribution() {
+            let u = 0, v = 0;
+            while (u === 0) u = Math.random(); // Converting [0,1) to (0,1)
+            while (v === 0) v = Math.random();
+            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
         }
 
         // Get references to HTML elements
