@@ -31,6 +31,23 @@
                 <button id="exploreBtn" class="btn btn-primary">Explore</button>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="Nmachine">Insert the numer of the machines</label>
+                    <input type="number" id="Nmachine" class="form-control" value="3">
+
+                    <label for="mu" class="Math">Insert the percentage drift \(\mu\)</label>
+                    <input type="number" id="mu" class="form-control" value="0.1">
+
+                    <label for="timeMax">Insert the max time</label>
+                    <input type="number" id="timeMax" class="form-control" value="100">
+
+                    <label for="dt">Insert the time step</label>
+                    <input type="number" id="dt" class="form-control" value="0.01">
+                </div>
+            </div>
+        </div>
 
         <div class="row mt-4">
             <div class="col-md-12">
@@ -72,9 +89,9 @@
         // Define functions to simulate stochastic processes
         function simulateGeometricBrownianMotion() {
             console.log('starting simulation');
-            const mu = 1;
-            const n = 100;
-            const dt = 0.1;
+            const mu = parseFloat(document.getElementById('mu').value);
+            const n = parseInt(document.getElementById('Nmachine').value);
+            const dt = parseFloat(document.getElementById('dt').value);
             const x0 = 100;
             const seed = 1;
 
@@ -91,13 +108,13 @@
                 let path = [x0];
                 console.log(`x0 = ${x0}`);
                 for (let j = 0; j < n; j++) {
-                    const randomNormal = standardNormalDistribution(); //thanks to CLT we know that our distribution will approximate a gaussian one with larger n. (to keep in mind anyway is that having larger n means more time for computation and also that we can't have true randomness in a general purpose pc).
+                    const randomNormal = gaussianRandom(); //thanks to CLT we know that our distribution will approximate a gaussian one with larger n. (to keep in mind anyway is that having larger n means more time for computation and also that we can't have true randomness in a general purpose pc).
                     //actually calculating the numerical value using the solution formula for geometric brownian motion
                     const increment = Math.exp((mu - Math.pow(sigma[i], 2) / 2) * dt + sigma[i] * randomNormal);
                     const newValue = path[path.length - 1] * increment; //incrementing the path based on the last computed value
 
                     const lastX = (j / n) * width;
-                    const lastY = height - (newValue / x0);
+                    const lastY = (height / 2) - (newValue / x0);
                     
 
                     path.push(newValue); //pushing the new value in the path
@@ -114,13 +131,15 @@
 
         function simulateArithmeticBrownianMotion() {
 
+
         }
 
-        function standardNormalDistribution() {
-            let u = 0, v = 0;
-            while (u === 0) u = Math.random(); // Converting [0,1) to (0,1)
-            while (v === 0) v = Math.random();
-            return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        function gaussianRandom(mean=0, stdev=1) {
+            const u = 1 - Math.random(); // Converting [0,1) to (0,1]
+            const v = Math.random();
+            const z = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+            // Transform to the desired mean and standard deviation:
+            return z * stdev + mean;
         }
 
         // Get references to HTML elements
