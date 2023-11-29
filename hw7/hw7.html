@@ -25,6 +25,8 @@
                         <option value="arithmeticBrownianMotion">Arithmetic Brownian Motion</option>
                         <option value="hullWhite">Hull - White</option>
                         <option value="coxIngellRoss">Cox-Ingell-Ross</option>
+                        <option value="ornestein">Ornestein</option>
+                        <option value="vasicek">Vasicek</option>
                         <!-- Add more options for other stochastic processes -->
                     </select>
                 </div>
@@ -71,6 +73,91 @@
                             <li><span class="Math">\(\sigma\)</span> is a constant that indicates the percentage volatility</li>
                         </ul>
                         the first addend is used to calculate and model deterministic trends while the second one tries to model non deterministic and unpredictable events during the process.
+                    </p>
+                </div>
+                <div id="theoryABM" style="display: none;">
+                    <p class="lead">The Arithmetic Brownian Motion</p>
+                    <p>
+                        The arithmetic brownian motion is a "normalized" continuous-time stochastic process derived by the geometric one.
+                        This process satisfies the following system:
+                        <div class="Math">
+                            \[
+                            dX_t = m dt + v dW_t
+                            \]
+                        </div>
+                        Where:
+                        <ul>
+                            <li><span class="Math">\(X_t\) = ln(frac{S_t}{S_0})</span></li>
+                            <li><span class="Math">\[m\]</span> and <span class="Math">v</span> are constant.</li>
+                        </ul>
+                        and for <span class="Math">\[X_0\]</span> as initial condition we have Arithmetic Brownian Motion. We can get to ABM from GBM by simply exchanging logarithm and exp combined with <a href="https://en.wikipedia.org/wiki/It%C3%B4%27s_lemma">Ito's formula'</a>.
+                    </p>
+                </div>
+                <div id="theoryHW" style="display: none;">
+                    <p class="lead">Hull-White model</p>
+                    <p>
+                        The Hull-White model is a model of future interests and it follows this dinamic:
+                        <div class="Math">
+                            \[
+                            dr(t) = [\theta(t) - \alpha(t)r(t)] dt +\sigma(t)dW(t)
+                            \]
+                        </div>
+                        if only <span class="Math">\[\theta\]</span> is time dependent we are talking about the Hull-White model, otherwise we are talking about the extended Vasicek model.
+                    </p>
+                </div>
+                <div id="theoryCIR" style="display: none;">
+                    <p class="lead">Cox-Ingell-Ross model/p>
+                        <p>
+                            The Cox-Ingell-Ross model is a financial "one-factor" model as it describes interests rate movements
+                            as driven by only one source of risk. The model is the following:
+                            <div class="Math">
+                                \[
+                                dr_t = a(b - r_t) dt + \sigma \sqrt{r_t}dW_t
+                                \]
+                            </div>
+                            Where
+                            <ul>
+                                <li><span class="Math">\[W_t\]</span> is a Wiener Process</li>
+                                <li><span class="Math">\[a\]</span> is the speed of adjustment to the mean <span class="Math">b</span></li>
+                                <li><span class="Math">\[\sigma\]</span> is the volatility</li>
+                            </ul>
+                            Like the GBM or other stochastic process we have the drift factor. In this case it's the dt's coefficient.
+                        </p>
+                </div>
+                <div id="theoryOrnestein" style="display: none;">
+                    <p class="lead">Ornestein</p>
+                    <p>
+                        The Ornstein–Uhlenbeck process is a stationary Gauss–Markov process, which means that it is a Gaussian process, a Markov process. It is defined by:
+                        <div class="Math">
+                            \[
+                            dx_t = -\theta x_t + \sigma dW_t
+                            \]
+                        </div>
+                        Where
+                        <ul>
+                            <li><span class="Math">\[\theta\]</span> and <span class="Math">\[\sigma\]</span> are positive parameters</li>
+                            <li><span>\[W_t\]</span> is a Wiener Process</li>
+                        </ul>
+                        The process can be considered to be a modification of the random walk in continuous time, or Wiener process, in which the properties of the process have been changed so that there is a tendency of the walk to move back towards a central location, with a greater attraction when the process is further away from the center
+                    </p>
+                </div>
+                <div id="theoryVasicek" style="display: none;">
+                    <p class="lead">Vasicek</p>
+                    <p>
+                        The model specifies that the instantaneous interest rate follows the stochastic differential equation: 
+                        <div class="Math">
+                            \[
+                            dr_t = a(b-r_t)dt+W_t 
+                            \]
+                        </div>
+                        Where:
+                        <ul>
+                            <li><span class="Math">\[b\]</span> is long term mean level: All future trajectories of r r will evolve around a mean level b in the long run</li>
+                            <li><span class="Math">\[a\]</span> "speed of reversion". a a characterizes the velocity at which such trajectories will regroup around b b in time</li>
+                            <li> <span class="Math">\[\sigma]</span> "instantaneous volatility", measures instant by instant the amplitude of randomness entering the system. Higher <span>\[\sigma\]</span> implies more randomness</li>
+                            <li><span class="Math">\[frac{\sigma^2}{2a}\]</span>: "long term variance". All future trajectories of r r will regroup around the long term mean with such variance after a long time.</li>
+                        </ul>
+                        
                     </p>
                 </div>
             </div>
@@ -153,19 +240,55 @@
 
             // Clear previous visualizations
             visualization.clearRect(0, 0, visualization.canvas.width, visualization.canvas.height);
-
+            const theoryGBM = document.getElementById('theoryGBM');
+            const theoryABM = document.getElementById('theoryABM');
+            const theoryHW = document.getElementById('theoryHW');
+            const theoryCIR = document.getElementById('coxIngellRoss');
+            const theoryOrnestein = document.getElementById('theoryOrnestein');
+            const theoryVasicek = document.getElementById('theoryVasicek');
+            theoryGBM.style.display = "none";
+            theoryABM.style.display = "none";
+            theoryHW.style.display = "none";
+            //theoryCIR.style.display = "none";
+            //theoryOrnestein.style.display = "none";
+            //theoryVasicek.style.display = "none";
             // Simulate and display the selected stochastic process
             switch (selectedProcess) {
+                
                 case 'geometricBrownianMotion':
                     simulateGeometricBrownianMotion();
-                    const theoryGBM = document.getElementById('theoryGBM');
+                    
                     if(theoryGBM.style.display === "none"){
                         theoryGBM.style.display = "block";
                     } 
                     break;
-                case 'brownianMotion':
+                case 'arithmeticBrownianMotion':
                     simulateArithmeticBrownianMotion();
+                    
+                    if(theoryABM.style.display === "none"){
+                        theoryABM.style.display = "block";
+                    }
                     break;
+                case 'hullWhite':
+                    simulateHullWhite();
+                    if(theoryHW.style.display === "none"){
+                        theoryHW.style.display = "block";
+                    }
+                case 'coxIngellRoss':
+                    simulateCoxIngellRoss();
+                    if(theoryCIR.style.display === "none"){
+                        theoryCIR.style.display = "block";
+                    }
+                case 'ornestein':
+                    simulateOrnestein();
+                    if(theoryOrnestein.style.display === "none"){
+                        theoryOrnestein.style.display = "block";
+                    }
+                case 'vasicek':
+                    simulateVasicek();
+                    if(theoryVasicek.style.display === "none"){
+                        theoryVasicek.style.display = "block";
+                    }
                 // Add cases for other stochastic processes
                 default:
                     // Handle invalid selection
