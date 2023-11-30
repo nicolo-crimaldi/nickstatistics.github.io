@@ -53,7 +53,7 @@
 
         <div class="row mt-4">
             <div class="col-md-12">
-                <canvas id="visualization" width="1000" height="500"></canvas>
+                <canvas id="visualization" width="1000" height="500" tabindex="1"></canvas>
             </div>
             <div id="theoryAll">
                 <div id="theoryGBM" style="display: none;">
@@ -194,6 +194,7 @@
             for (let i = 0; i < sigma.length; i++) {
                 let path = [x0];
                 console.log(`x0 = ${x0}`);
+                ctx.moveTo(0, height / 2);
                 for (let j = 0; j < n; j++) {
                     const randomNormal = gaussianRandom(); //thanks to CLT we know that our distribution will approximate a gaussian one with larger n. (to keep in mind anyway is that having larger n means more time for computation and also that we can't have true randomness in a general purpose pc).
                     //actually calculating the numerical value using the solution formula for geometric brownian motion
@@ -201,14 +202,11 @@
                     const newValue = path[path.length - 1] * increment; //incrementing the path based on the last computed value
 
                     const lastX = (j / n) * width;
-                    const lastY = (height / 2) - (newValue / x0);
+                    const lastY = -((height / 2) - (newValue / x0));
                     
 
                     path.push(newValue); //pushing the new value in the path
 
-                    if(j === 0){
-                        ctx.moveTo(0, height);
-                    }
                     ctx.lineTo(lastX, lastY);
                 }
                 ctx.stroke();
@@ -220,6 +218,54 @@
 
 
         }
+
+
+        // initiate variables : canvas ref, offsets, scale...
+        const context   = document.getElementById('visualization').getContext('2d');
+        let scale       = 1;
+        let scaleFactor = 0.2;
+        let scrollX     = 0;
+        let scrollY     = 0;
+
+        // Handle mousenwheel zoom
+        context.canvas.onwheel =  function(e){
+        e.preventDefault();
+        let previousScale= scale;
+        
+        // calculate scale direction 6 new scale value
+        let direction = e.deltaY > 0 ? 1 : -1;
+        scale += scaleFactor * direction;
+
+        // calculate the new scroll values
+        scrollX += ( e.offsetX / previousScale )  - (e.offsetX  / scale);
+        scrollY += ( e.offsetY / previousScale ) - ( e.offsetY / scale);
+        
+        // apply new scale in a non acumulative way
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.scale(scale, scale);
+        }
+
+
+        // clear canvas and draw two boxes
+        function render(){
+            context.beginPath();
+            context.clearRect(0,0,context.canvas.width/scale, context.canvas.height/scale);
+            context.stroke();
+            
+            requestAnimationFrame( render );
+        }
+
+        // handlencursor keys to move scroll
+        window.onkeydown = function(event){
+            event.preventDefault();
+            if(event.keyCode == 37)      scrollX -=10;
+            else if(event.keyCode == 39) scrollX +=10;
+            else if(event.keyCode == 38) scrollY -=10;
+            else if(event.keyCode == 40) scrollY +=10;
+        };
+
+        context.canvas.focus()
+        render()
 
         function gaussianRandom(mean=0, stdev=1) {
             const u = 1 - Math.random(); // Converting [0,1) to (0,1]
@@ -243,7 +289,7 @@
             const theoryGBM = document.getElementById('theoryGBM');
             const theoryABM = document.getElementById('theoryABM');
             const theoryHW = document.getElementById('theoryHW');
-            const theoryCIR = document.getElementById('coxIngellRoss');
+            const theoryCIR = document.getElementById('theoryCIR');
             const theoryOrnestein = document.getElementById('theoryOrnestein');
             const theoryVasicek = document.getElementById('theoryVasicek');
             theoryGBM.style.display = "none";
