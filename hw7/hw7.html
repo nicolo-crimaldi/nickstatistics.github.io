@@ -7,6 +7,15 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        #visualization {
+            background-color: black;
+            border: 1px solid blue;
+            vertical-align: top;
+            margin-left: 10px;
+            float: left;
+          }  
+    </style>
 </head>
 <body>
     <header>
@@ -23,38 +32,29 @@
                     <select id="processSelect" class="form-control">
                         <option value="geometricBrownianMotion">Geometric Brownian Motion</option>
                         <option value="arithmeticBrownianMotion">Arithmetic Brownian Motion</option>
-                        <option value="hullWhite">Hull - White</option>
-                        <option value="coxIngellRoss">Cox-Ingell-Ross</option>
-                        <option value="ornestein">Ornestein</option>
+                        <option value="ornsteinUhlenbeck">Ornstein Uhlenbeck (mean-reverting)</option>
                         <option value="vasicek">Vasicek</option>
+                        <option value="coxIngellRoss">Cox-Ingell-Ross</option>
                         <!-- Add more options for other stochastic processes -->
                     </select>
+                        <label for="mu">Coefficiente di ritorno al valore medio (\( \theta \)): </label>
+                        <input type="number" step="0.01" id="theta" value="0.1"><br>
+                        <label for="mu">Drift (\( \mu \)): </label>
+                        <input type="number" step="0.01" id="mu" value="0.1"><br>
+                        <label for="sigma">Diffusion (\( \sigma \)): </label>
+                        <input type="number" step="0.01" id="sigma" value="0.2"><br>
+                        <label for="dt">Time Step (\( \Delta t \)): </label>
+                        <input type="number" step="0.01" id="dt" value="0.01"><br>
+                        <label for="totalTime">Total Time: </label>
+                        <input type="number" step="1" id="totalTime" value="100"><br>
+                        <label for="numPaths">Number of Machines: </label>
+                        <input type="number" step="1" id="numPaths" value="3"><br>
                 </div>
-                <button id="exploreBtn" class="btn btn-primary">Explore</button>
+                <button id="exploreBtn" class="btn btn-primary">Simulate</button>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="Nmachine">Insert the numer of the machines</label>
-                    <input type="number" id="Nmachine" class="form-control" value="3">
-
-                    <label for="mu" class="Math">Insert the percentage drift \(\mu\)</label>
-                    <input type="number" id="mu" class="form-control" value="0.1">
-
-                    <label for="timeMax">Insert the max time</label>
-                    <input type="number" id="timeMax" class="form-control" value="100">
-
-                    <label for="dt">Insert the time step</label>
-                    <input type="number" id="dt" class="form-control" value="0.01">
-                </div>
-            </div>
-        </div>
-
         <div class="row mt-4">
-            <div class="col-md-12">
-                <canvas id="visualization" width="1000" height="500" tabindex="1"></canvas>
-            </div>
+            <canvas id="visualization" width="1200" height="450"></canvas>
             <div id="theoryAll">
                 <div id="theoryGBM" style="display: none;">
                     <p class="lead">The Geometric Brownian Process</p>
@@ -177,95 +177,183 @@
         function simulateGeometricBrownianMotion() {
             console.log('starting simulation');
             const mu = parseFloat(document.getElementById('mu').value);
-            const n = parseInt(document.getElementById('Nmachine').value);
+            const sigma = parseFloat(document.getElementById('sigma').value);
             const dt = parseFloat(document.getElementById('dt').value);
-            const x0 = 100;
-            const seed = 1;
-
-            const sigma = [];
-            for (let s = 0.8; s < 2; s += 0.2) {
-                sigma.push(s);
-            }
-            console.log(`sigma = ${sigma}`);
-
-            const width = canva.width;
-            const height = canva.height;
-            console.log(`height = ${height}, width = ${width}`);
-            for (let i = 0; i < sigma.length; i++) {
-                let path = [x0];
-                console.log(`x0 = ${x0}`);
-                ctx.moveTo(0, height / 2);
-                for (let j = 0; j < n; j++) {
-                    const randomNormal = gaussianRandom(); //thanks to CLT we know that our distribution will approximate a gaussian one with larger n. (to keep in mind anyway is that having larger n means more time for computation and also that we can't have true randomness in a general purpose pc).
-                    //actually calculating the numerical value using the solution formula for geometric brownian motion
-                    const increment = Math.exp((mu - Math.pow(sigma[i], 2) / 2) * dt + sigma[i] * randomNormal);
-                    const newValue = path[path.length - 1] * increment; //incrementing the path based on the last computed value
-
-                    const lastX = (j / n) * width;
-                    const lastY = -((height / 2) - (newValue / x0));
-                    
-
-                    path.push(newValue); //pushing the new value in the path
-
-                    ctx.lineTo(lastX, lastY);
+            const totalTime = parseFloat(document.getElementById('totalTime').value);
+            const numPaths = parseInt(document.getElementById('numPaths').value);
+        
+            const scaleX = canva.width / totalTime;
+            const scaleY = canva.height / 20; // Adjust as needed
+        
+            ctx.clearRect(0, 0, canva.width, canva.height);
+        
+            for (let pathIndex = 0; pathIndex < numPaths; pathIndex++) {
+                let currentValue = 1; // Start from an initial value of 1
+        
+                ctx.beginPath();
+                ctx.moveTo(0, canva.height / 2);
+        
+                for (let t = 0; t <= totalTime; t += dt) {
+                    const randomValue = gaussianRandom();
+                    currentValue = currentValue * Math.exp((mu - (sigma ** 2) / 2) * dt + sigma * Math.sqrt(dt) * randomValue);
+        
+                    const x = t * scaleX;
+                    const y = canva.height - currentValue * scaleY;
+        
+                    ctx.lineTo(x, y);
                 }
+        
+                // Set a random color for each path
+                ctx.strokeStyle = getRandomColor();
+                ctx.stroke();
+            }
+        }
+
+        function simulateArithmeticBrownianMotion() {
+            const mu = parseFloat(document.getElementById('mu').value);
+            const sigma = parseFloat(document.getElementById('sigma').value);
+            const dt = parseFloat(document.getElementById('dt').value);
+            const totalTime = parseFloat(document.getElementById('totalTime').value);
+            const numPaths = parseInt(document.getElementById('numPaths').value);
+            const scaleX = canva.width / totalTime;
+            const scaleY = canva.height / 10; // Adjust as needed
+
+            ctx.clearRect(0, 0, canva.width, canva.height);
+
+            for (let pathIndex = 0; pathIndex < numPaths; pathIndex++) {
+                let currentValue = 0;
+
+                ctx.beginPath();
+                ctx.moveTo(0, canva.height / 2);
+
+                for (let t = 0; t <= totalTime; t += dt) {
+                    const randomValue = gaussianRandom();
+                    currentValue = currentValue + mu * dt + sigma * Math.sqrt(dt) * randomValue;
+
+                    const x = t * scaleX;
+                    const y = canva.height / 2 - currentValue * scaleY;
+
+                    ctx.lineTo(x, y);
+                }
+
+                // Set a random color for each path
+                ctx.strokeStyle = getRandomColor();
                 ctx.stroke();
             }
 
         }
 
-        function simulateArithmeticBrownianMotion() {
+        function simulateOrnsteinUhlenbeck (){
+            // Parametri del processo di Ornstein-Uhlenbeck
+            const theta = parseFloat(document.getElementById('theta').value);
+            const mu = parseFloat(document.getElementById('mu').value); //ok
+            const sigma = parseFloat(document.getElementById('sigma').value);//ok   
+            // Numero di percorsi da simulare
+            const numPaths = parseInt(document.getElementById('numPaths').value);// ok  
+            // Intervallo di tempo e numero di passi
+            const dt = parseFloat(document.getElementById('dt').value); //ok
+            const totalTime = parseFloat(document.getElementById('totalTime').value);   
+            // !!! const numSteps = parseInt(document.getElementById('numSteps').value); // NO SAREBBE: totalTime !!!  
+            ctx.clearRect(0, 0, canva.width, canva.height); 
+            for (let path = 0; path < numPaths; path++) {
+                // Inizializzazione del valore iniziale per ogni percorso
+                let x = 0.0;    
+                // Generazione di un colore casuale per ogni percorso
+                const color = getRandomColor(); 
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;  
+                for (let t = 0; t < totalTime; t += dt) {
+                // Calcolo dell'incremento stocastico
+                    const dW = sigma * Math.sqrt(dt) * (2 * Math.random() - 1); 
+                    // Risoluzione dell'equazione differenziale stocastica
+                    x += theta * (mu - x) * dt + dW;    
+                    // Disegno della linea tra i punti successivi
+                    const xPos = t * (canva.width / totalTime);
+                    const yPos = canva.height - x * (canva.height / (2 * mu)) + path * 20;
+                    
+                    if (t === 0) {
+                        ctx.moveTo(xPos, yPos);
+                    } else {
+                        ctx.lineTo(xPos, yPos);
+                    }
+                }   
+                ctx.stroke();
+            }
+       }
 
+       function simulateVasicek() {
+        // FORMULA DI VASICEK: drt=a(b−rt)dt+σdWt
+        const a = parseFloat(document.getElementById('theta').value); 
+        const b = parseFloat(document.getElementById('mu').value);
+        const sigma = parseFloat(document.getElementById('sigma').value);
+        const dt = parseFloat(document.getElementById('dt').value);
+        const totalTime = parseFloat(document.getElementById('totalTime').value);
+        const numPaths = parseInt(document.getElementById('numPaths').value);
 
+    
+        const scaleX = canva.width / totalTime;
+        const scaleY = canva.height / 10; // Adjust as needed
+    
+        ctx.clearRect(0, 0, canva.width, canva.height);
+    
+        for (let pathIndex = 0; pathIndex < numPaths; pathIndex++) {
+            let currentValue = 0;
+    
+            ctx.beginPath();
+            ctx.moveTo(0, canva.height / 2);
+    
+            for (let t = 0; t <= totalTime; t += dt) {
+                const randomValue = gaussianRandom();
+                currentValue = currentValue + a * (b - currentValue) * dt + sigma * Math.sqrt(dt) * randomValue;
+    
+                const x = t * scaleX;
+                const y = canva.height / 2 - currentValue * scaleY;
+    
+                ctx.lineTo(x, y);
+            }
+    
+            // Set a random color for each path
+            ctx.strokeStyle = getRandomColor();
+            ctx.stroke();
         }
+    }
 
-
-        // initiate variables : canvas ref, offsets, scale...
-        const context   = document.getElementById('visualization').getContext('2d');
-        let scale       = 1;
-        let scaleFactor = 0.2;
-        let scrollX     = 0;
-        let scrollY     = 0;
-
-        // Handle mousenwheel zoom
-        context.canvas.onwheel =  function(e){
-        e.preventDefault();
-        let previousScale= scale;
-        
-        // calculate scale direction 6 new scale value
-        let direction = e.deltaY > 0 ? 1 : -1;
-        scale += scaleFactor * direction;
-
-        // calculate the new scroll values
-        scrollX += ( e.offsetX / previousScale )  - (e.offsetX  / scale);
-        scrollY += ( e.offsetY / previousScale ) - ( e.offsetY / scale);
-        
-        // apply new scale in a non acumulative way
-        context.setTransform(1, 0, 0, 1, 0, 0);
-        context.scale(scale, scale);
+    function simulateCoxIngellRoss() {
+        // Parametri del processo di Cox-Ingersoll-Ross
+        const a = parseFloat(document.getElementById('theta').value);
+        const b = parseFloat(document.getElementById('mu').value);
+        const sigma = parseFloat(document.getElementById('sigma').value);
+        const dt = parseFloat(document.getElementById('dt').value);
+        const totalTime = parseFloat(document.getElementById('totalTime').value);
+        const numPaths = parseInt(document.getElementById('numPaths').value);
+    
+        const scaleX = canva.width / totalTime;
+        const scaleY = canva.height / 10; // Adjust as needed
+    
+        ctx.clearRect(0, 0, canva.width, canva.height);
+    
+        for (let pathIndex = 0; pathIndex < numPaths; pathIndex++) {
+            let currentValue = 0;
+    
+            ctx.beginPath();
+            ctx.moveTo(0, canva.height / 2);
+    
+            for (let t = 0; t <= totalTime; t += dt) {
+                const randomValue = gaussianRandom();
+                currentValue = currentValue + a * (b - currentValue) * dt + sigma * Math.sqrt(currentValue) * randomValue;
+    
+                const x = t * scaleX;
+                const y = canva.height / 2 - currentValue * scaleY;
+    
+                ctx.lineTo(x, y);
+            }
+    
+            // Set a random color for each path
+            ctx.strokeStyle = getRandomColor();
+            ctx.stroke();
         }
-
-
-        // clear canvas and draw two boxes
-        function render(){
-            context.beginPath();
-            context.clearRect(0,0,context.canvas.width/scale, context.canvas.height/scale);
-            context.stroke();
-            
-            requestAnimationFrame( render );
-        }
-
-        // handlencursor keys to move scroll
-        window.onkeydown = function(event){
-            event.preventDefault();
-            if(event.keyCode == 37)      scrollX -=10;
-            else if(event.keyCode == 39) scrollX +=10;
-            else if(event.keyCode == 38) scrollY -=10;
-            else if(event.keyCode == 40) scrollY +=10;
-        };
-
-        context.canvas.focus()
-        render()
+    }
 
         function gaussianRandom(mean=0, stdev=1) {
             const u = 1 - Math.random(); // Converting [0,1) to (0,1]
@@ -285,7 +373,7 @@
             const selectedProcess = processSelect.value;
 
             // Clear previous visualizations
-            visualization.clearRect(0, 0, visualization.canvas.width, visualization.canvas.height);
+            visualization.clearRect(0, 0, canva.width, canva.height);
             const theoryGBM = document.getElementById('theoryGBM');
             const theoryABM = document.getElementById('theoryABM');
             const theoryHW = document.getElementById('theoryHW');
@@ -325,8 +413,8 @@
                     if(theoryCIR.style.display === "none"){
                         theoryCIR.style.display = "block";
                     }
-                case 'ornestein':
-                    simulateOrnestein();
+                case 'ornsteinUhlenbeck':
+                    simulateOrnsteinUhlenbeck();
                     if(theoryOrnestein.style.display === "none"){
                         theoryOrnestein.style.display = "block";
                     }
@@ -349,6 +437,15 @@
             MathJax.typesetPromise([
                 document.getElementsByClassName('Math')
             ]);
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
         }
 
         // Check if MathJax is loaded, then render equations
