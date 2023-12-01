@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaussian Distribution with MathJax</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+  <div class="container mt-4">
+    <h1>Gaussian Distribution</h1>
+    <p>The Gaussian probability distribution is a probability distribution that is symmetric about the mean (the average value), the mode (the most frequent value) and the median (the value saparating the lower half from the bigger half)
+        The general form is the following one:
+    </p>
+    <div class="math">
+      \[ f(x|\mu,\sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x-\mu)^2}{2\sigma^2}} \]
+    </div>
+    <p class="h2">Standard form of the gaussian distribution</p>
+    <p>
+        The simplest case is the standard distribution:
+    </p>
+    <div class="math">
+        \[
+        \phi(z) = \frac{e^{-{z^2}/2}}{\sqrt{2\pi}}
+        \]
+    </div>
+    <p>
+        Where:
+        <ul>
+            <li><span class="math">\(\mu\)</span> is the mean or expectation of the distribution (and also its median and mode hence they are equal)</li>
+            <li><span class="math">\(\sigma\)</span> is the standard deviation: a measure that indicates the dispersion of a set of values. (a lower deviation means that the set is concentrated in the center.)</li>
+        </ul>
+    </p>
+    <div>
+        <img id="gaussian_distribution" src="./images/gaussian_distribution.png" alt="gaussian distribution">
+        <label for="gaussian-distribution">Example of a general gaussian distribution</label>
+    </div>
+    <p>
+        We can observe that <span class="math">\(\mu = 0\)</span> and <span class="math">\(\sigma = 1\)</span>. Moreover the variable <span class="math">\(z\)</span> has a mean of 0
+        and a variance of 1. Also, the fractional term in the general form is there to make sure that the area and
+    </p>
+    
+    <div>
+        <h2>Simulations</h2>
+        <canvas id="gaussianCanvas" width="600" height="400"></canvas>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and jQuery (for Bootstrap) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    // Function to generate random values from standard normal distribution
+    // Function to generate random values from standard normal distribution
+    // Function to calculate Gaussian distribution value
+function gaussian(x, mean, stdDev) {
+    const coefficient = 1 / (stdDev * Math.sqrt(2 * Math.PI));
+    const exponent = -((x - mean) ** 2) / (2 * stdDev ** 2);
+    return coefficient * Math.exp(exponent);
+  }
+  
+  function plotHistogram() {
+    const canvas = document.getElementById('gaussianCanvas');
+    const ctx = canvas.getContext('2d');
+  
+    const numPoints = 1000;
+    const binWidth = 10;
+    const mean = 0;
+    const stdDev = 1;
+    const numBins = Math.ceil(canvas.width / binWidth);
+    const histogram = new Array(numBins).fill(0);
+  
+    // Calculate histogram values based on Gaussian distribution
+    for (let i = 0; i < numBins; i++) {
+      const x = (i / numBins) * canvas.width;
+      const y = gaussian(x, mean * canvas.width, stdDev * canvas.width);
+      const barHeight = y * canvas.height;
+      histogram[i] = barHeight;
+    }
+  
+    // Plot histogram bars
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < numBins; i++) {
+      ctx.fillStyle = 'blue';
+      ctx.fillRect(i * binWidth, canvas.height - histogram[i], binWidth - 1, histogram[i]);
+    }
+    ctx.stroke();
+  }
+  
+  window.onload = function() {
+    plotHistogram();
+  };
+  
+  
+  </script>
+</body>
+
+</html>
