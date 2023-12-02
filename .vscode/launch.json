@@ -8,6 +8,13 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
+            "name": "launch gaussian",
+            "file": "${workspaceFolder}/thesis/gaussian_distribution.html"
+        },
+        {
+            "type": "firefox",
+            "request": "launch",
+            "reAttach": true,
             "name": "Launch hw5.html",
             "file": "${workspaceFolder}/hw5/hw5.html"
         },

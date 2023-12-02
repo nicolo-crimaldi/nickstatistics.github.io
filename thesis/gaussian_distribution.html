@@ -44,18 +44,66 @@
             <li><span class="math">\(\sigma\)</span> is the standard deviation: a measure that indicates the dispersion of a set of values. (a lower deviation means that the set is concentrated in the center.)</li>
         </ul>
     </p>
-    <div>
-        <img id="gaussian_distribution" src="./images/gaussian_distribution.png" alt="gaussian distribution">
-        <label for="gaussian-distribution">Example of a general gaussian distribution</label>
-    </div>
     <p>
         We can observe that <span class="math">\(\mu = 0\)</span> and <span class="math">\(\sigma = 1\)</span>. Moreover the variable <span class="math">\(z\)</span> has a mean of 0
         and a variance of 1. Also, the fractional term in the general form is there to make sure that the area and
     </p>
+
+    <div>
+      <img id="gaussian_distribution" src="./images/gaussian_distribution.png" alt="gaussian distribution">
+      <label for="gaussian-distribution">Example of a general gaussian distribution</label>
+    </div>
     
     <div>
+      <div>
         <h2>Simulations</h2>
-        <canvas id="gaussianCanvas" width="600" height="400"></canvas>
+        <img src="./images/normal-density.png" alt="normal density">
+      </div>
+        code:
+        <pre>
+          <code>
+            // Function to generate random values from standard normal distribution
+            // Function to generate random values from standard normal distribution
+            // Function to calculate Gaussian distribution value
+            function gaussian(x, mean, stdDev) {
+                const coefficient = 1 / (stdDev * Math.sqrt(2 * Math.PI));
+                const exponent = -((x - mean) ** 2) / (2 * stdDev ** 2);
+                return coefficient * Math.exp(exponent);
+            }
+  
+            function plotHistogram() {
+              const canvas = document.getElementById('gaussianCanvas');
+              const ctx = canvas.getContext('2d');
+            
+              const numPoints = 1000;
+              const binWidth = 10;
+              const mean = 0;
+              const stdDev = 1;
+              const numBins = Math.ceil(canvas.width / binWidth);
+              const histogram = new Array(numBins).fill(0);
+            
+              // Calculate histogram values based on Gaussian distribution
+              for (let i = 0; i < numBins; i++) {
+                const x = (i / numBins) * canvas.width;
+                const y = gaussian(x, mean * canvas.width, stdDev * canvas.width);
+                const barHeight = y * canvas.height;
+                histogram[i] = barHeight;
+              }
+            
+              // Plot histogram bars
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              for (let i = 0; i < numBins; i++) {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(i * binWidth, canvas.height - histogram[i], binWidth - 1, histogram[i]);
+              }
+              ctx.stroke();
+            }
+            
+            window.onload = function() {
+              plotHistogram();
+            };
+          </code>
+        </pre>
     </div>
   </div>
 
