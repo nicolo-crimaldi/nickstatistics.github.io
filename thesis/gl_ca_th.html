@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glivenko-Cantelli Theorem</title>
+  
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  
+  <!-- MathJax CDN -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <!-- Optional: Some additional CSS files or your own CSS -->
+  <!-- <link rel="stylesheet" href="path/to/your/additional-styles.css"> -->
+</head>
+<body>
+  <div class="mx-auto" style="width: 50%;">
+    <h1>The Glivenko-Cantelli Theorem: proof and simulations</h1>
+    <h2>Introduction</h2>
+    <p>
+      In the theory of probability, the Glivenko-Cantelli theorem determines the asymptotic behaviour of the empyrical distribution function as the number of independent and identically distributed observation grows
+    </p>
+    <h2>
+      Statement
+    </h2>
+    <p>
+      Assume <span class="math">\(X_1, X_2, ... \) </span> as indepent and identically distributed random variables in <span class="math">\(\mathbb{R}\)</span> with common cumulative distribution <span class="math">\(F(x)\)</span>
+      and the empirical distribution called <span>\(F_n(x)\)</span> based on n independent, identically distributed random variables. According to the Glivenko-Cantelli theorem values the following:
+      <div class="math">
+        \[
+        \sup\limits_{x} |F_n(x) - F(x)| \to 0 
+        \]
+      </div>
+      as <span class="math">\(n\)</span> approaches <span class="math">\(\infty\)</span> almost surely.
+    </p>
+    <h2>
+      Proof
+    </h2>
+    <p>
+      Let's define the empyrical distribution as:
+      <div>
+        \[
+        F_n(x) = \frac{1}{n} \sum\limits_{i = 1}^{n} I\{X_i \leq x\}
+        \]
+      </div>
+      by applying the law of large numbers (strong version) we can deduce that <span class="math">\(F_n(x)\)</span>, for every fixed x converges to <span class="math">F(x)</span> almost surely, hence we have:
+      <div class="math">
+        \[
+        ||F_n(x) - F(x)||_\infty = 0\ a. s.
+        \]</div>
+    </p>
+    <h2>Simulations</h2>
+    <div>
+      <pre>
+        <code lang="javascript">
+          // Function to calculate the empirical cumulative distribution function (ECDF)
+          function calculateECDF(sample, x) {
+            return sample.filter(value => value <= x).length / sample.length;
+          }
+      
+          // Function to generate a random sample from a uniform distribution
+          function generateUniformSample(sampleSize) {
+            const sample = [];
+            for (let i = 0; i < sampleSize; i++) {
+              sample.push(Math.random()); // Generating random numbers between 0 and 1 (uniform distribution)
+            }
+            return sample;
+          }
+      
+          // Canvas setup
+          const canvas = document.getElementById('myCanvas');
+          const ctx = canvas.getContext('2d');
+          const canvasWidth = canvas.width;
+          const canvasHeight = canvas.height;
+          const padding = 40;
+      
+          // True CDF of the uniform distribution
+          const trueCDF = x => x;
+      
+          // Simulate Glivenko-Cantelli theorem
+          const sampleSizes = [50, 100, 500, 1000]; // Different sample sizes
+      
+          sampleSizes.forEach((sampleSize, index) => {
+            const sample = generateUniformSample(sampleSize);
+            const ecdfValues = [];
+      
+            for (let i = 0; i <= 100; i++) {
+              const x = i / 100; // Values from 0 to 1
+              ecdfValues.push(calculateECDF(sample, x));
+            }
+      
+            // Plot ECDF
+            ctx.beginPath();
+            ctx.strokeStyle = `hsl(${(index * 50) % 360}, 70%, 50%)`; // Varying colors
+            ctx.moveTo(padding, canvasHeight - (ecdfValues[0] * (canvasHeight - padding)));
+            for (let i = 1; i < ecdfValues.length; i++) {
+              const x = padding + (i / ecdfValues.length) * (canvasWidth - padding * 2);
+              const y = canvasHeight - (ecdfValues[i] * (canvasHeight - padding));
+              ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+          });
+        </code>
+      </pre>
+      <div onload="plotGraph()">
+        <canvas id="myCanvas" width="800px" height="400px"></canvas>
+      </div>
+      
+    </div>
+    
+  </div>
+  
+  <script>
+    // Function to calculate the empirical cumulative distribution function (ECDF)
+    function calculateECDF(sample, x) {
+      return sample.filter(value => value <= x).length / sample.length;
+    }
+
+    // Function to generate a random sample from a uniform distribution
+    function generateUniformSample(sampleSize) {
+      const sample = [];
+      for (let i = 0; i < sampleSize; i++) {
+        sample.push(Math.random()); // Generating random numbers between 0 and 1 (uniform distribution)
+      }
+      return sample;
+    }
+
+    function plotGraph(){
+        // Canvas setup
+      const canvas = document.getElementById('myCanvas');
+      const ctx = canvas.getContext('2d');
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const padding = 40;
+
+      // True CDF of the uniform distribution
+      const trueCDF = x => x;
+
+      // Simulate Glivenko-Cantelli theorem
+      const sampleSizes = [50, 100, 500, 1000]; // Different sample sizes
+
+      sampleSizes.forEach((sampleSize, index) => {
+        const sample = generateUniformSample(sampleSize);
+        const ecdfValues = [];
+
+        for (let i = 0; i <= 100; i++) {
+          const x = i / 100; // Values from 0 to 1
+          ecdfValues.push(calculateECDF(sample, x));
+        }
+
+        // Plot ECDF
+        ctx.beginPath();
+        ctx.strokeStyle = `hsl(${(index * 50) % 360}, 70%, 50%)`; // Varying colors
+        ctx.moveTo(padding, canvasHeight - (ecdfValues[0] * (canvasHeight - padding)));
+        for (let i = 1; i < ecdfValues.length; i++) {
+          const x = padding + (i / ecdfValues.length) * (canvasWidth - padding * 2);
+          const y = canvasHeight - (ecdfValues[i] * (canvasHeight - padding));
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      });
+    }
+    
+  </script>
+  
+  <!-- Bootstrap JS and jQuery (Optional but required for some Bootstrap features) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  <!-- Optional: Your own JavaScript files -->
+  <!-- <script src="path/to/your/script.js"></script> -->
+</body>
+</html>
