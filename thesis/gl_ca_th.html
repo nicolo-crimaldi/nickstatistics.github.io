@@ -103,13 +103,21 @@
           });
         </code>
       </pre>
-      <div onload="plotGraph()">
+      <div>
         <canvas id="myCanvas" width="800px" height="400px"></canvas>
       </div>
+      <p>
+        As we can see, the bigger the sample size is, the more accurate is the approximation to the expected distribution.
+      </p>
       
     </div>
     
   </div>
+
+  <ol type="1">
+    <cite>Bibliography</cite>
+    <li style="padding-left:30px "><a href="https://en.wikipedia.org/wiki/Glivenko%E2%80%93Cantelli_theorem">1</a></li>
+ </ol>
   
   <script>
     // Function to calculate the empirical cumulative distribution function (ECDF)
@@ -128,6 +136,7 @@
 
     function plotGraph(){
         // Canvas setup
+      console.log('dentro plotgraph');
       const canvas = document.getElementById('myCanvas');
       const ctx = canvas.getContext('2d');
       const canvasWidth = canvas.width;
@@ -161,6 +170,10 @@
         ctx.stroke();
       });
     }
+
+    document.addEventListener(onload = ()=>{
+      this.plotGraph();
+    });
     
   </script>
   

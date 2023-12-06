@@ -51,6 +51,12 @@
             "request": "launch",
             "reAttach": true,
             "addonPath": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "name": "http://onload=\"plotGraph()\"",
+            "request": "launch",
+            "url": "http://onload=\"plotGraph()\""
         }
     ]
 }
