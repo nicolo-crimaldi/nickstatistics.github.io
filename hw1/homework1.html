@@ -8,59 +8,81 @@
     <title>Homework 1</title>
 </head>
 <body>
-    <div>
+    <div class="mx-auto" style="width: 80%;">
         <h1>Homework 1</h1>
         <h2>Theory</h2>
         <ul class="list-group">
-            <li class="list-group-item"> <p class="lead">What is Statistics and its relationship with other disciplines. Difference between Descriptive and Inferential Statistics.</p><br> 
+            <li class="list-group-item"> 
+                <p class="lead">What is Statistics and its relationship with other disciplines. Difference between Descriptive and Inferential Statistics.</p><br> 
                 Statistics is a branch of mathematics that deals with collecting, analizing, and organizing data. In practice, statistics is the idea that we can learn about the properties of large set of objects which are <b>populations</b> and <b>samples</b> It's used in many disciplines like electrical engineering: 
                 it's used in the manipulation of random signals, in medicine to analize clinical trials and draw conclusion in scientific studies. It's also used in cybersecurity for risk management and in machine learning. <br>
                 To introduce descriptive and Inferential statistics we need to talk about populations and samples:
                 <ul>
-                    <li class="list-item"><b>Populations:</b> is a set made of statistical units. Some example may be a class of students, the population of a nation and so long so forth. The choice of a population is on who conducts the study, the only rule to be respected is that the population has to be relevant.</li>
-                    <li class="list-item"><b>Samples:</b> it is simply a sub-set of a population. The sample procedure is pretty hard hence a new branch of statistics has been founded to occupy of this.</li>
+                    <li class="list-item"><b>Populations:</b>A population is a pool of statistical units that are the units we want to study. In every day example, populations can be groups of people, financial assets or any group that has some common characteristics.</li>
+                    <li class="list-item"><b>Samples:</b> A sample is a subset of a population, hence it should represent the population as a whole and not reflect any bias towards a specific attribute.</li>
                 </ul>
+                <p class="py-1">Below we will get deeper in the concepts of populations and samples.</p>
                 So Statistics is divided in two main branches:
                 <ul>
-                    <li class="list-item"><b>Descriptive statistics:</b> it's a term used to practice a descriptive analysis of the data. It's used when we need to present our raw data in a meaningful way</li>
-                    <li class="list-item"><b>Inferential statistics:</b> it's a set of tools that mathematicians use to draw conclusion about the characteristics of a population drawn from the characteristics of a sample and determine how certain can be those.</li>
+                    <li class="list-item"><b>Descriptive statistics:</b> it's a term used to practice a <b>descriptive</b> analysis of the data. It's used when we need to present our raw data in a meaningful way. It provides important ways to have a quick glance of the central tendency of a phenomenon and the degree of dispersion of a dataset.</li>
+                    <li class="list-item"><b>Inferential statistics:</b> it's a set of tools that mathematicians use to draw conclusion about the characteristics of a population drawn from the characteristics of a sample and determine how certain can be those.  Specifically, the inferential statistics makes proposition about a population using data drawn from a sample. The statistical inference consists of selecting a statistical model of the process that generates the data to deduce the proposition from the model.</li>
                 </ul>
             </li>
-            <li class="list-group-item"> <p class="lead">Describe the concepts of Population, Sample, Attribute, Variable, Level of measurement and Dataset. </p><br>
+            <li class="list-group-item"> 
+                <p class="lead">Describe the concepts of Population, Sample, Attribute, Variable, Level of measurement and Dataset. </p><br>
                 <ul>
                     <li class="list-item"><b>Populations: </b> is a set made of statistical units. Some example may be a class of students, the population of a nation and so long so forth. The choice of a population is on who conducts the study, the only rule to be respected is that the population has to be relevant.</li>
                     <li class="list-item"><b>Samples:</b> it is simply a sub-set of a population. The sample procedure is pretty hard hence a new branch of statistics has been founded to occupy of this.</li>
-                    <li class="list-item"><b>Variables: </b> A variable is a data set that can be counted that marks a characteristic or attribute of an item. (source: <u>https://www.investopedia.com/terms/s/statistics.asp</u>) </li>
-                    <li class="list-item"><b>Attribute: </b> an attribute is An attribute refers to the quality of a characteristic. The theory of attributes deals with qualitative types of characteristics that are calculated by using quantitative measurements. Therefore, the attribute needs slightly different kinds of statistical treatments, which the variables do not get. (source: <u>https://www.statisticssolutions.com/attribute/</u>)</li>
-                    <li class="list-item"><b>Level of measurement: </b> level of measurements indicates which values the variable can assume. We have four most important level of measurement: Nominal (latin name only), ordinal (for ordered level or ranks), interval (we have equal interval among sets), ratio (the scale always starts with a zero) (source: <u>https://www.statisticssolutions.com/dissertation-resources/descriptive-statistics/data-levels-of-measurement/</u>)</li>
+                    <li class="list-item"><b>Variables: </b> A variable is a characteristic that can be measured or counted. It could also be a data item.</li>
+                    <li class="list-item"><b>Attribute: </b> An attribute refers to the quality of a characteristic. The theory of attributes deals with qualitative types of characteristics that are calculated by using quantitative measurements. Therefore, the attribute needs slightly different kinds of statistical treatments, which the variables do not get.</li>
+                    <li class="list-item"><b>Level of measurement: </b> level of measurements indicates which values the variable can assume. We have four most important level of measurement: Nominal (latin name only), ordinal (for ordered level or ranks), interval (we have equal interval among sets), ratio (the scale always starts with a zero).</li>
                 </ul>
             </li>
-            <li class="list-group-item"><p class="lead">Briefly describe the main sampling methods</p>
-                <li class="list-item"><p class="h5">The main sampling methods are divided in two main categories: <b>probability sampling methods</b> and <b>non probability sampling methods</b></p>
-                    <p class="h6">Probability sampling methods</p>
-                    <ul>
-                        <li class="list-item"><b>Simple random sampling:</b> using this way of sampling, every member of the population has the same chance to be included in the sampling frame. To conduct this sampling some random number generators can be used.</li>
-                        <li class="list-item"><b>Systematic sampling:</b> very similar to the previous one. With the only difference that every member is listed with a number and the sample members are chosen at regular intervals. The most important issue is that we have to be sure that there are no hidden patterns.</li>
-                        <li class="list-item"><b>Stratified sampling:</b>Stratified sampling involves dividing the population into subpopulations that may differ in important ways. It allows you draw more precise conclusions by ensuring that every subgroup is properly represented in the sample. 
-                            To use this sampling method, you divide the population into subgroups (called strata) based on the relevant characteristic. Then calculate the proportions between subgroups to see how many should be chosen for the sample and then apply systematic sampling for the scale.</li>
-                        <li class="list-item"><b>Cluster Sampling:</b> population is divided into subgroups where every subgroup has similar characteristics to the whole sample. Instead of selecting individuals, whole subgroups takes part to the sample randomly.</li>             
-                    </ul>
-                    <p class="h6">Non probability sampling methods</p>
-                    <ul>
-                        <li class="list-item"><b>Convenience sampling:</b> simply includes individuals who can be the most accessible to the researcher. It's a very inexpensive method but also there's no way to tell if the sample is representative.</li>
-                        <li class="list-item"><b>Voluntary response sampling:</b> it's based on ease of access but the researcher does not choose the participants but they are the ones to volunteer for the research.</li>
-                        <li class="list-item"><b>Purposive sampling:</b> with this method the researcher is asked to put in practice theyr expertise to choose the most adapt sample based on the purpose of the research.</li>
-                        <li class="list-item"><b>Snowball sampling:</b> if the population is hard to access then this method is used to recruit other participant through participants. The downside is the representiveness totally out of control of the researcher.</li>
-                        <li class="list-item"><b>Quota sampling:</b> Quota sampling relies on the non-random selection of a predetermined number or proportion of units. This is called a quota. You first divide the population into mutually exclusive subgroups (called strata) and then recruit sample units until you reach your quota. These units share specific characteristics.</li>
-                    </ul>
-                </li>
-                (source: <u>https://www.scribbr.com/methodology/sampling-methods/#:~:text=Probability%20sampling%20methods%20include%20simple,a%20chance%20of%20being%20included.</u>)
+            <li class="list-group-item">
+                <p class="lead">Briefly describe the main sampling methods</p>
+                <ul>
+                    <li class="list-item"><p class="h5">The main sampling methods are divided in two main categories: <b>probability sampling methods</b> and <b>non probability sampling methods</b></p>
+                        <p class="h6">Probability sampling methods</p>
+                        <ul>
+                            <li class="list-item"><b>Simple random sampling:</b> using this way of sampling, every member of the population has the same chance to be included in the sampling frame. To conduct this sampling some random number generators can be used.</li>
+                            <li class="list-item"><b>Systematic sampling:</b> very similar to the previous one. With the only difference that every member is listed with a number and the sample members are chosen at regular intervals. The most important issue is that we have to be sure that there are no hidden patterns.</li>
+                            <li class="list-item"><b>Stratified sampling:</b>Stratified sampling involves dividing the population into subpopulations that may differ in important ways. It allows you draw more precise conclusions by ensuring that every subgroup is properly represented in the sample. 
+                                To use this sampling method, you divide the population into subgroups (called strata) based on the relevant characteristic. Then calculate the proportions between subgroups to see how many should be chosen for the sample and then apply systematic sampling for the scale.</li>
+                            <li class="list-item"><b>Cluster Sampling:</b> population is divided into subgroups where every subgroup has similar characteristics to the whole sample. Instead of selecting individuals, whole subgroups takes part to the sample randomly.</li>             
+                        </ul>
+                        <p class="h6">Non probability sampling methods</p>
+                        <ul>
+                            <li class="list-item"><b>Convenience sampling:</b> simply includes individuals who can be the most accessible to the researcher. It's a very inexpensive method but also there's no way to tell if the sample is representative.</li>
+                            <li class="list-item"><b>Voluntary response sampling:</b> it's based on ease of access but the researcher does not choose the participants but they are the ones to volunteer for the research.</li>
+                            <li class="list-item"><b>Purposive sampling:</b> with this method the researcher is asked to put in practice theyr expertise to choose the most adapt sample based on the purpose of the research.</li>
+                            <li class="list-item"><b>Snowball sampling:</b> if the population is hard to access then this method is used to recruit other participant through participants. The downside is the representiveness totally out of control of the researcher.</li>
+                            <li class="list-item"><b>Quota sampling:</b> Quota sampling relies on the non-random selection of a predetermined number or proportion of units. This is called a quota. You first divide the population into mutually exclusive subgroups (called strata) and then recruit sample units until you reach your quota. These units share specific characteristics.</li>
+                        </ul>
+                    </li>
+                </ul>
+                
+
             </li>
-            <li class="list-group-item"><p class="lead">Briefly describe the main experiment designs </p>
-                <li class="list-item"><b>Completely randomized design:</b> in this design the treatments are assigned to each statistical unit with complete randomness. The downside of this design is the lack of control in the quantity of units to which every treatments is assigned</li>
-                <li class="list-item"><b>Block randomized design:</b> this design solves the problem of the above one: sample is assigned randomly but this time blocks of fixed size of units are used.</li>
-                <li class="list-item"><b>Factorial design:</b> factorial experiments are used to draw conclusion about one or more factor or variable. It's called like this because every combination of factors is involved.</li>
-                <p>(source: <u>https://www.britannica.com/science/statistics/Experimental-design</u> )</p>
+            <li class="list-group-item">
+                <p class="lead">Briefly describe the main experiment designs </p>
+                <ul>
+                    <li class="list-item"><b>Completely randomized design:</b> in this design the treatments are assigned to each statistical unit with complete randomness. The downside of this design is the lack of control in the quantity of units to which every treatments is assigned</li>
+                    <li class="list-item"><b>Block randomized design:</b> this design solves the problem of the above one: sample is assigned randomly but this time blocks of fixed size of units are used.</li>
+                    <li class="list-item"><b>Factorial design:</b> factorial experiments are used to draw conclusion about one or more factor or variable. It's called like this because every combination of factors is involved.</li>
+                </ul>
+
+            </li>
+            <li class="list-group-item">Sources: 
+                <ol>
+                <li><a href="https://www.scribbr.com/methodology/population-vs-sample/">Scribbr for population and sample definition and example</a></li>
+                <li><a href="https://www.investopedia.com/terms/d/descriptive_statistics.asp">Investopedia for descriptive statitstics</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Statistical_inference">Wikipedia for inferential statistics</a></li>
+                <li><a href="https://www.investopedia.com/terms/s/statistics.asp">Investopedia for variables</a></li>
+                <li><a href="https://www.abs.gov.au/statistics/understanding-statistics/statistical-terms-and-concepts/variables">Australian burau of statistics for the definition of variables in statistics.</a></li>
+                <li><a href="https://www.statisticssolutions.com/attribute/">Statistics solutions for the definition of attribute</a></li>
+                <li><a href="https://www.statisticssolutions.com/dissertation-resources/descriptive-statistics/data-levels-of-measurement/">Statistics solutions for the definition of the levels of measurement</a></li>
+                <li><a href="https://www.scribbr.com/methodology/sampling-methods/#:~:text=Probability%20sampling%20methods%20include%20simple,a%20chance%20of%20being%20included">Scribbr for sampling methods</a></li>
+                </ol>
             </li>
         </ul>
         <h2>Applications</h2>
