@@ -42,104 +42,202 @@
     </div>
     <div>
         <script>
-            function loadTSV(callback){//make the http request to get the file
-                const url = "https://raw.githubusercontent.com/ZioNick1/nickstatistics.github.io/main/datasets/Professional%20Life%20-%20Sheet1.tsv";
-                const http = new XMLHttpRequest();
-                http.open("GET", url, true);
-                http.send();
-                console.log('sent');
-                http.responseType = "text";
-                http.onload = () => {
-                    if(http.readyState === 4 && http.status === 200){
-                        const data = http.response;
-                        console.log(data);
-                        callback(data);
-                    } else{
-                        console.log(http.status);
-                    }
-                } 
+        
+            const csvUrl = 'https://github.com/ZioNick1/nickstatistics.github.io/blob/main/datasets/Professional%20Life%20-%20Sheet1.tsv';
+    
+            fetch(csvUrl)
+            .then(response => response.text())
+            .then(data => {
+                const lines = data.split('\n');
+                const result = [];
+                const headers = lines[0].split('\t');
+    
+                const heightIntervals = {
+                "1.50-1.59": { min: 1.60, max: 1.59 },
+                "1.60-1.69": { min: 1.60, max: 1.69 },
+                "1.70-1.79": { min: 1.70, max: 1.79 },
+                "1.80-1.89": { min: 1.80, max: 1.89 },
+                "1.90-1.99": { min: 1.90, max: 1.99 },
+                };
                 
-            }
-
-            function readTSV(callback){//actual parsing the file to an array of arrays
-                loadTSV((data) => {
-                    let matrix = [];
-                    const rows = data.split('\n');
-                    rows.forEach((row) => {
-                        const columns = row.split('\t');
-                        matrix.push(columns);
-                    });
-                    callback(matrix);
-                })
-            } 
-
-            function addToSelect(){//adding to the form the multiple variable
-                readTSV((completeMatrix) => {
-                    let header = completeMatrix[0];
-                    let sel = document.getElementById("var");
-                    for (let i = 0; i < header.length; i++) {
-                        let option = document.createElement("option");
-                        option.value = header[i];
-                        option.text = header[i];
-                        sel.appendChild(option)
-                        
-                    }
+                joinLines = 0;
+    
+                const columnData = {};
+                const distribuzioneCongiunta = {};
+    
+                headers.forEach(header => {
+                columnData[header] = {};
                 });
-                
-            }
-            document.addEventListener("DOMContentLoaded", addToSelect());
-
-            function load(){
-                let sel = document.getElementById("var");
-                sel.onload = addToSelect();
-            }
-
-            var selectedVariable = [];
-
-            document.addEventListener("click", ()=>{
-                const button = document.getElementById("addVariable");
-                const sel = document.getElementById("var");
-                const errorPar = document.createElement("p");
-                errorPar.id = "errorPar";
-                errorPar.innerText = "You already selected this variable";
-                errorPar.hidden = true;
-                const answerDiv = document.getElementById("variableDiv");
-                answerDiv.appendChild(errorPar);
-                console.log('inside the event');
-                button.onclick=()=>{
-                    const table = document.getElementById("variableSelected");
-                    const entry = document.createElement("li");
-                    if (selectedVariable.includes(sel.value)) {
-                        const innerErrorPar = document.getElementById("errorPar");
-                        innerErrorPar.hidden = false;
-                        console.log(errorPar.hidden);
-                    } else {
-                        selectedVariable.push(sel.value);
-                        entry.innerText = selectedVariable[selectedVariable.length - 1];
-                        table.appendChild(entry);
-                        console.log(errorPar.hidden);
-                        const innerErrorPar = document.getElementById("errorPar");
-                        innerErrorPar.hidden = true;
+    
+                for (let i = 1; i < lines.length; i++) {
+                    const currentLine = lines[i].split(',');
+                    const age = currentLine[headers.indexOf("Age")];
+                    const sport = currentLine[headers.indexOf("Sports")];
+    
+                    for (let j = 0; j < headers.length; j++) {
+                        const header = headers[j];
+                        const cellValue = currentLine[j];
+    
+                        if (cellValue!='-'){
+                            if (columnData[header][cellValue]) {
+                                columnData[header][cellValue] += 1;
+                            } else {
+                                columnData[header][cellValue] = 1;
+                            }
+                        }
                     }
-                        
+    
+                    if (age && sport && age!='-' && sport!='-') {
+                        const chiave = `${age}-${sport}`;
+                        if (distribuzioneCongiunta[chiave]) {
+                            distribuzioneCongiunta[chiave] += 1;
+                        } else {
+                            distribuzioneCongiunta[chiave] = 1;
+                        }
+                        joinLines += 1;
+                    }
                 }
-            });
-            
-
-
+    
+                const heightCounts = {};
+                for (const interval in heightIntervals) {
+                    heightCounts[interval] = 0;
+                }
+                
+                for (var chiave in columnData["Height\r"]) {
+                    if (columnData["Height\r"].hasOwnProperty(chiave)) {
+                        const height = parseFloat(chiave.replace(',', '.'));
+                        for (const i in heightIntervals) {
+                            var min = parseFloat(i.split('-')[0]);
+                            var max = parseFloat(i.split('-')[1]);
+                            if (height >= min && height <= max) {
+                                heightCounts[i] += 1;
+                            }
+                        }
+                        
+                    }
+                }
+    
+                var tableAge = document.getElementById("tableAge");
+                var tableSport = document.getElementById("tableSport");
+                var tableHeight = document.getElementById("tableHeight");
+                var tableJoin = document.getElementById("tableJOIN");
+    
+                for (var chiave in columnData["Age"]) {
+                    if (columnData["Age"].hasOwnProperty(chiave)) {
+                        var riga = tableAge.insertRow(tableAge.rows.length);
+                        var cellaChiave = riga.insertCell(0);
+                        var absoluteFrequenceCell = riga.insertCell(1);
+                        var relativeFrequenceCell = riga.insertCell(2);
+                        var percentageFrequenceCell = riga.insertCell(3);
+                        
+    
+                        cellaChiave.innerHTML = chiave;
+                        absoluteFrequenceCell.innerHTML = columnData["Age"][chiave];
+                        relativeFrequenceCell.innerHTML = (columnData["Age"][chiave] / lines.length).toFixed(5);
+                        percentageFrequenceCell.innerHTML = ((columnData["Age"][chiave] / lines.length)*100).toFixed(5);
+                    }
+                }
+    
+                for (const interval in heightCounts) {
+                    const riga = tableHeight.insertRow(tableHeight.rows.length);
+                    const cellaChiave = riga.insertCell(0);
+                    const absoluteFrequenceCell = riga.insertCell(1);
+                    const relativeFrequenceCell = riga.insertCell(2);
+                    const percentageFrequenceCell = riga.insertCell(3);
+    
+                    cellaChiave.innerHTML = interval;
+                    absoluteFrequenceCell.innerHTML = heightCounts[interval];
+                    relativeFrequenceCell.innerHTML = (heightCounts[interval] / lines.length).toFixed(5);
+                    percentageFrequenceCell.innerHTML = ((heightCounts[interval] / lines.length) * 100).toFixed(5);
+                }
+    
+                for (var chiave in columnData["Sports"]) {
+                    if (columnData["Sports"].hasOwnProperty(chiave)) {
+                        var riga = tableSport.insertRow(tableSport.rows.length);
+                        var cellaChiave = riga.insertCell(0);
+                        var absoluteFrequenceCell = riga.insertCell(1);
+                        var relativeFrequenceCell = riga.insertCell(2);
+                        var percentageFrequenceCell = riga.insertCell(3);
+    
+                        cellaChiave.innerHTML = chiave;
+                        absoluteFrequenceCell.innerHTML = columnData["Sports"][chiave];
+                        relativeFrequenceCell.innerHTML = (columnData["Sports"][chiave] / lines.length).toFixed(5);
+                        percentageFrequenceCell.innerHTML = ((columnData["Sports"][chiave] / lines.length)*100).toFixed(5);
+                    }
+                }
+    
+                for (var chiave in distribuzioneCongiunta) {
+                    if (distribuzioneCongiunta.hasOwnProperty(chiave)) {
+                        var riga = tableJoin.insertRow(tableJoin.rows.length);
+                        var cellaChiave = riga.insertCell(0);
+                        var absoluteFrequenceCell = riga.insertCell(1);
+                        var relativeFrequenceCell = riga.insertCell(2);
+                        var percentageFrequenceCell = riga.insertCell(3);
+    
+                        cellaChiave.innerHTML = chiave;
+                        absoluteFrequenceCell.innerHTML = distribuzioneCongiunta[chiave];
+                        relativeFrequenceCell.innerHTML = (distribuzioneCongiunta[chiave] / joinLines).toFixed(5);
+                        percentageFrequenceCell.innerHTML = ((distribuzioneCongiunta[chiave] / joinLines) * 100).toFixed(5);
+                    }
+                }
+    
+                console.log(columnData);
+                console.log(distribuzioneCongiunta);
+            })
+            .catch(error => console.error('Errore durante il recupero del file CSV:', error));
         </script>
-        <form>
-            <label for="variables">Choose a variable</label>
-            <select name="variables" id="var" onload="addToSelect"></select>
-            <button type="button" id="addVariable" onclick="click()">Add to variables to calculate the frequency</button>
-            <button type="button" id="evalButton">Calculate frequencies</button>
-            <div id="variableDiv">
-                <p>You selected the following variables:</p>
-                <ul id="variableSelected">
-
-                </ul>
-            </div>
-        </form>
+        <style>
+            .center-table {
+                margin: 0 auto;
+                text-align: center;
+            }
+        </style>
+        <div class="container" style="background-color: white; text-align: center; margin-top:7vh;">
+            <br>
+            <h3>Variable: Age -> quantitative discrete</h3>
+            <table class="table table-bordered table-striped center-table" id="tableAge" style="max-width: 60vw; text-align: right;">
+                <tr>
+                    <th scope="col" style="text-align: center;"> Age (years) </th>
+                    <th scope="col" style="text-align: center;"> Absolute frequence </th>
+                    <th scope="col" style="text-align: center;"> Relative frequence </th>
+                    <th scope="col" style="text-align: center;"> Percentage frequence </th>
+                </tr>
+            </table>
+            <br>
+            <br>
+            <h3>Variable: height -> quantitative continous</h3>
+            <table class="table table-bordered table-striped center-table" id="tableHeight" style="max-width: 60vw; text-align: right;">
+                <tr>
+                    <th scope="col" style="text-align: center;"> Height (cm) </th>
+                    <th scope="col" style="text-align: center;"> Absolute frequence </th>
+                    <th scope="col" style="text-align: center;"> Relative frequence </th>
+                    <th scope="col" style="text-align: center;"> Percentage frequence </th>
+                </tr>
+            </table>
+            <br>
+            <br>
+            <h3>Variable: sport -> qualitative </h3>
+            <table class="table table-bordered table-striped center-table" id="tableSport" style="max-width: 60vw; text-align: right;">
+                <tr>
+                    <th scope="col" style="text-align: center;"> Sport </th>
+                    <th scope="col" style="text-align: center;"> Absolute frequence </th>
+                    <th scope="col" style="text-align: center;"> Relative frequence </th>
+                    <th scope="col" style="text-align: center;"> Percentage frequence </th>
+                </tr>
+            </table>
+            <br>
+            <br>
+            <h3>JOIN DISTRIBUTION: sport and age </h3>
+            <table class="table table-bordered table-striped center-table" id="tableJOIN" style="max-width: 60vw; text-align: right;">
+                <tr>
+                    <th scope="col" style="text-align: center;"> Age - Sport </th>
+                    <th scope="col" style="text-align: center;"> Absolute frequence </th>
+                    <th scope="col" style="text-align: center;"> Relative frequence </th>
+                    <th scope="col" style="text-align: center;"> Percentage frequence </th>
+                </tr>
+            </table>
+            <br>
+            <br>
         
 
     </div>
@@ -810,100 +908,153 @@ class Program
             </code>
         </pre>
     </div>
-    <script>
-        var matrix = [];
-        var numCols;
-        var numRows;
-        function tsvParser(input){ //we get the file to analyze and put the results in a matrix
-            let file = input.files[0];//here we store the content of the file
-            let reader = new FileReader();
-            reader.readAsText(file);//actually read the the content of the file as plain text
-            reader.onload = ()=>{
-                const content = reader.result;
-                const rows = content.split('\n');
-                rows.forEach((row) => {
-                    const columns = row.split('\t')
-                    matrix.push(columns);//we push the results in a matrix which is an array made of arrays
-                });
-                evalFrequency();
-                calculateFrequencies();
-            };
-            reader.onerror = ()=>{
-                console.log(reader.error)
-            };
-        }
-        function evalFrequency(){
-            //initializing objects to calculate absolute frequency
-            var ageFrequency = {};
-            var backgroundFrequency = {};
-            var heightFrequency = {};
-            //actual frequency calculation
-            matrix.forEach((column)=>{
-                for (let row = 0; row < matrix.length; row++) {//first for is for age frequency
-                    if(matrix[0][column] === document.querySelector(exampleInputEmail1).value){
-                        let age = matrix[row][column];
-                        ageFrequency += (age || 0) + 1;
+    <p>In js:</p>
+    const csvUrl = 'https://github.com/ZioNick1/nickstatistics.github.io/blob/main/datasets/Professional%20Life%20-%20Sheet1.tsv';
+    
+    fetch(csvUrl)
+    .then(response => response.text())
+    .then(data => {
+        const lines = data.split('\n');
+        const result = [];
+        const headers = lines[0].split('\t');
+
+        const heightIntervals = {
+        "1.50-1.59": { min: 1.60, max: 1.59 },
+        "1.60-1.69": { min: 1.60, max: 1.69 },
+        "1.70-1.79": { min: 1.70, max: 1.79 },
+        "1.80-1.89": { min: 1.80, max: 1.89 },
+        "1.90-1.99": { min: 1.90, max: 1.99 },
+        };
+        
+        joinLines = 0;
+
+        const columnData = {};
+        const distribuzioneCongiunta = {};
+
+        headers.forEach(header => {
+        columnData[header] = {};
+        });
+
+        for (let i = 1; i < lines.length; i++) {
+            const currentLine = lines[i].split(',');
+            const age = currentLine[headers.indexOf("Age")];
+            const sport = currentLine[headers.indexOf("Sports")];
+
+            for (let j = 0; j < headers.length; j++) {
+                const header = headers[j];
+                const cellValue = currentLine[j];
+
+                if (cellValue!='-'){
+                    if (columnData[header][cellValue]) {
+                        columnData[header][cellValue] += 1;
+                    } else {
+                        columnData[header][cellValue] = 1;
                     }
                 }
-                for (let row = 0; row < matrix.length; row++) {//second for is for height frequency
-                    if(matrix[0][column] === document.querySelector(exampleInputPassword1).value){
-                        let height = parseFloat(matrix[row][column]);
-                        heightFrequency += (height || 0) + 1;
+            }
+
+            if (age && sport && age!='-' && sport!='-') {
+                const chiave = `${age}-${sport}`;
+                if (distribuzioneCongiunta[chiave]) {
+                    distribuzioneCongiunta[chiave] += 1;
+                } else {
+                    distribuzioneCongiunta[chiave] = 1;
+                }
+                joinLines += 1;
+            }
+        }
+
+        const heightCounts = {};
+        for (const interval in heightIntervals) {
+            heightCounts[interval] = 0;
+        }
+        
+        for (var chiave in columnData["Height\r"]) {
+            if (columnData["Height\r"].hasOwnProperty(chiave)) {
+                const height = parseFloat(chiave.replace(',', '.'));
+                for (const i in heightIntervals) {
+                    var min = parseFloat(i.split('-')[0]);
+                    var max = parseFloat(i.split('-')[1]);
+                    if (height >= min && height <= max) {
+                        heightCounts[i] += 1;
                     }
                 }
-                for (let row = 0; row < matrix.length; row++) {//third for is for background frequency
-                    if(matrix[0][column] === document.querySelector(exampleInputVariable1).value){
-                        let background = parseFloat(matrix[row][column]);
-                        backgroundFrequency += (background || 0) + 1;
-                    }
-                }
-            });
-            displayTable(ageFrequency, document.querySelector(exampleInputEmail1));
-            displayTable(backgroundFrequency, document.querySelector(exampleInputPassword1));
-            displayTable(heightFrequency, document.querySelector(exampleInputVariable1).value);
+                
+            }
         }
-        function displayTable(frequencies, variable) {
-            var table = '<h3>' + variable + '</h3>';
-            table += '<table>';
-            table += '<tr><th>Value</th><th>Absolute Frequency</th><th>Relative Frequency</th><th>Percentage</th></tr>';
 
-            var total = Object.values(frequencies).reduce((acc, val) => acc + val, 0);
+        var tableAge = document.getElementById("tableAge");
+        var tableSport = document.getElementById("tableSport");
+        var tableHeight = document.getElementById("tableHeight");
+        var tableJoin = document.getElementById("tableJOIN");
 
-            Object.entries(frequencies).forEach(function ([key, value]) {
-                var relativeFrequency = value / total;
-                var percentage = (relativeFrequency * 100).toFixed(2) + '%';
+        for (var chiave in columnData["Age"]) {
+            if (columnData["Age"].hasOwnProperty(chiave)) {
+                var riga = tableAge.insertRow(tableAge.rows.length);
+                var cellaChiave = riga.insertCell(0);
+                var absoluteFrequenceCell = riga.insertCell(1);
+                var relativeFrequenceCell = riga.insertCell(2);
+                var percentageFrequenceCell = riga.insertCell(3);
+                
 
-                table += '<tr><td>' + key + '</td><td>' + value + '</td><td>' + relativeFrequency.toFixed(2) + '</td><td>' + percentage + '</td></tr>';
-            });
-
-            table += '</table>';
-            document.body.innerHTML += table;
+                cellaChiave.innerHTML = chiave;
+                absoluteFrequenceCell.innerHTML = columnData["Age"][chiave];
+                relativeFrequenceCell.innerHTML = (columnData["Age"][chiave] / lines.length).toFixed(5);
+                percentageFrequenceCell.innerHTML = ((columnData["Age"][chiave] / lines.length)*100).toFixed(5);
+            }
         }
-        function calculateFrequencies(input = matrix) {
-            // Initialize objects for frequencies
-            var combinedFrequency = {};
 
-            // Calculate frequencies for combined
-            input.forEach(function (row) {
-                var combined = row.join(' - ');
-                combinedFrequency[combined] = (combinedFrequency[combined] || 0) + 1;
-            });
+        for (const interval in heightCounts) {
+            const riga = tableHeight.insertRow(tableHeight.rows.length);
+            const cellaChiave = riga.insertCell(0);
+            const absoluteFrequenceCell = riga.insertCell(1);
+            const relativeFrequenceCell = riga.insertCell(2);
+            const percentageFrequenceCell = riga.insertCell(3);
 
-            // Display the results in a table
-            displayTableJ(combinedFrequency, 'Combined (Background - Age)');
+            cellaChiave.innerHTML = interval;
+            absoluteFrequenceCell.innerHTML = heightCounts[interval];
+            relativeFrequenceCell.innerHTML = (heightCounts[interval] / lines.length).toFixed(5);
+            percentageFrequenceCell.innerHTML = ((heightCounts[interval] / lines.length) * 100).toFixed(5);
         }
-        function displayTableJ(frequencies, variable) {
-            var table = '<h3>' + variable + '</h3>';
-            table += '<table>';
-            table += '<tr><th>Value</th><th>Frequency</th></tr>';
 
-            Object.entries(frequencies).forEach(function ([key, value]) {
-                table += '<tr><td>' + key + '</td><td>' + value + '</td></tr>';
-            });
+        for (var chiave in columnData["Sports"]) {
+            if (columnData["Sports"].hasOwnProperty(chiave)) {
+                var riga = tableSport.insertRow(tableSport.rows.length);
+                var cellaChiave = riga.insertCell(0);
+                var absoluteFrequenceCell = riga.insertCell(1);
+                var relativeFrequenceCell = riga.insertCell(2);
+                var percentageFrequenceCell = riga.insertCell(3);
 
-            table += '</table>';
-            document.getElementById('resultTables').innerHTML = table;
+                cellaChiave.innerHTML = chiave;
+                absoluteFrequenceCell.innerHTML = columnData["Sports"][chiave];
+                relativeFrequenceCell.innerHTML = (columnData["Sports"][chiave] / lines.length).toFixed(5);
+                percentageFrequenceCell.innerHTML = ((columnData["Sports"][chiave] / lines.length)*100).toFixed(5);
+            }
         }
-    </script>
+
+        for (var chiave in distribuzioneCongiunta) {
+            if (distribuzioneCongiunta.hasOwnProperty(chiave)) {
+                var riga = tableJoin.insertRow(tableJoin.rows.length);
+                var cellaChiave = riga.insertCell(0);
+                var absoluteFrequenceCell = riga.insertCell(1);
+                var relativeFrequenceCell = riga.insertCell(2);
+                var percentageFrequenceCell = riga.insertCell(3);
+
+                cellaChiave.innerHTML = chiave;
+                absoluteFrequenceCell.innerHTML = distribuzioneCongiunta[chiave];
+                relativeFrequenceCell.innerHTML = (distribuzioneCongiunta[chiave] / joinLines).toFixed(5);
+                percentageFrequenceCell.innerHTML = ((distribuzioneCongiunta[chiave] / joinLines) * 100).toFixed(5);
+            }
+        }
+
+        console.log(columnData);
+        console.log(distribuzioneCongiunta);
+    })
+    .catch(error => console.error('Errore durante il recupero del file CSV:', error));
+    <pre>
+        <code>
+
+        </code>
+    </pre>
 </body>
 </html>
