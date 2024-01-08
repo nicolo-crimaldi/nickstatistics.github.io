@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wiener Process and Geometric Brownian Motion</title>
+  <!-- Bootstrap CSS CDN link -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- MathJax CDN link -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    /* Additional CSS styling */
+    .math {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>Wiener Process and Geometric Brownian Motion</h1>
+    <div class="row">
+      <div class="col-md-8">
+        <h2>Wiener Process</h2>
+        <p class="h4">
+            Introduction
+        </p>
+        <p>
+          The Wiener process, also known as Brownian motion, is a stochastic process used in various fields of mathematics and sciences. It is characterized by its continuous trajectories that are not differentiable.
+        </p>
+        <p class="my-1">
+            Sometimes it's also called Brownian Motion due to the similarity and connection with the famous physical phenomenon. This process plays an important role in many fields that space from economics to physics
+        </p>
+        <p class="h4">
+            Definition
+        </p>
+        <p class="math">
+            A real value stochastic process $\{W_t: t \geq 0 \}$ defined on a probability space $(\Omega, \mathcal{A}, \mathbb{P})$ is a standard Wiener process if it has the following properties:
+            <ol>
+                <li>
+                    The initial value of the stochastic process $W_0 = 0$ with probability 1
+                </li>
+                <li>
+                    The increment $W_t - W_s$ is independent of the past and that is $W_u$ with $0 \leq u \leq s$
+                </li>
+                <li>
+                    The increment $W_t -W_s$ is a normal variable with mean and variance $t - s$
+                </li>
+            </ol>
+        </p>
+        <p class="h4">
+            Derivations
+        </p>
+        <p class="math">
+            <ol>
+                <li>
+                    The initial value being 0 simply reflects the starting point of the process. This is often considered a natural choice, and it aligns with the idea that the process represents a particle starting at the origin.
+                </li>
+                <li>
+                    The independence of increments is a key property. It means that the future behavior of the process does not depend on its past. This property is often derived using the fact that normal distributions are stable under linear combinations.
+                </li>
+                <li>
+                    The Gaussian distribution of increments arises due to the Central Limit Theorem. When aggregating a significant quantity of independent and identically distributed random variables (in this instance, increments), their collective distribution converges toward a Gaussian distribution.
+                </li>
+            </ol>
+        </p>
+        <div class="math">
+          <h3>Example Equation for Wiener Process</h3>
+          <p>Here is an equation representing the Wiener process:</p>
+          <div id="wiener-equation">
+            $$ W(t) = W(0) + \mu t + \sigma B(t) $$
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <h2>Geometric Brownian Motion</h2>
+        <p>
+          Geometric Brownian Motion is a continuous-time stochastic process in which the logarithm of the randomly varying quantity follows a browian motion with drift. It is an important example of stochastic process which satisfyes a SDE (Stochastic Differential Equation).
+        </p>
+        <div class="math">
+            <p class="h4">
+                Definition
+            </p>
+            <p>
+                A stochastich process $S_t$ is said to follow a GBM if it satisfies the following SDE:
+            </p>
+            <p>
+                $d S_t = \mu S_t dt + \sigma S_t dW_t$
+            </p>
+            <p>
+                Where
+                <ul>
+                    <li>$W_t$ is a Wiener process</li>
+                    <li>$\mu$ is a percentage drift</li>
+                    <li>$\sigma$ is the is the percentage volatility</li>
+                </ul>
+                The last two are constants.
+            </p>
+        </div>
+        <div class="Math">
+            <p class="h4">Derivation of the GBM</p>
+            <p>
+                The SDE mentioned above, for an initial value $S_0$ has the following solution:
+                <p>
+                    $
+                    S_t = S_0 e^{((\mu - \frac{\sigma ^ 2}{2}) t + dW_t)}
+                    $
+                </p>
+                This solution is found applying Ito's calculus.
+            </p>
+        </div>
+        <div>
+            <p class="lead">Simulations</p>
+            <p>
+                The following Python code simulates both processes:
+            </p>
+            <pre>
+                <code>
+import numpy as no
+import matplotlib.pyplot as plt
+
+#Wiener
+
+T = 1
+dt = 0.01
+t = np.arange(0, T+dt, dt)
+num_paths = 5
+
+wiener = np.cumsum(np.sqrt(dt) * np.random.randn(len(t), num_paths), axis = 0)
+
+#GBM
+mu = 0.01
+sigma = 0.2
+S = np.zeros(len(t), num_paths)
+S[0, =] = 1
+
+for i in range(1, len(t))
+	dW = np.sqrt(dt) * np.random(randn(1, num_paths))
+	S[i, :] = S[i-1, :] np.exp(mu-0.5 * sigma**2 * dt + sigma * dW) 
+
+plt.figure(figsize = (10,6))
+plt.subplot(2, 1, 1)
+plt.plot(t, wiener)
+plt.title('Wiener Process Simulations')
+
+plt.figure(figsize = (10,6))
+plt.subplot(2, 1, 1)
+plt.plot(t, S)
+plt.title('GBM Simulations')
+
+plt.show()
+
+                </code>
+            </pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // MathJax configuration with callback
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+      },
+      startup: {
+        ready: function () {
+          // Callback querying .math selector
+          MathJax.startup.defaultReady();
+          MathJax.startup.promise.then(() => {
+            const mathElements = document.querySelectorAll('.math');
+            if (mathElements.length > 0) {
+              MathJax.typesetPromise(null, mathElements).then(() => {
+                console.log('MathJax typesetting complete');
+              });
+            }
+          });
+        }
+      }
+    };
+  </script>
+
+  <div>
+    <p>Sources:</p>
+    <p>
+        <ul>
+            <a href="https://en.wikipedia.org/wiki/Wiener_process">1</a>
+            <a href="https://en.wikipedia.org/wiki/Geometric_Brownian_motion">2</a>
+            <a href="https://hpaulkeeler.com/wiener-or-brownian-motion-process/">3</a>
+        </ul>
+    </p>
+  </div>
+</body>
+</html>
