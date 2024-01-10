@@ -34,6 +34,16 @@
 
         <p>The theorem has applications in various fields such as statistics, econometrics, and signal processing, providing insights into the behavior of complex systems composed of many random elements.</p>
         <p class="h4">
+          Formal statement
+        </p>
+        <p class="math">
+          Let \(F_n\) be the empirical distribution of i.i.d. random variables with distribution function <i>F</i>. Define the centered and scaled \(F_n\) by 
+          \[
+          G_n(x) = \sqrt{n}(F_n(n)-F(x))
+          \]
+          With n increasing, it converges to a gaussian distribution by the central limit theorem, for fixed x.
+        </p>
+        <p class="h4">
             Proof sketch
         </p>
         <p class="math">
@@ -90,7 +100,12 @@ simulate_fclt(num_functions, sample_size)
       </pre>
       <p>
         <img src="./images/fclt.png" alt="fclt simulations">
-      </p>
+      </p> 
+      <ul>
+        <li>
+          <a href="https://en.wikipedia.org/wiki/Donsker%27s_theorem">1</a>
+        </li>
+      </ul>  
     </div>
   </div>
 
