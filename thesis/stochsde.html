@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stochastic Processes and SDEs</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    /* Styling for math equations */
+    .math {
+      display: block;
+      text-align: center;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mt-4 mb-4">Stochastic Processes and SDEs</h1>
+
+    <div class="row">
+      <div class="col-md-8">
+        <p>A stochastic process is any process describing the evolution in time of a random phenomenon. biology, chemistry, ecology, neuroscience, physics, image processing, signal processing, control theory, information theory, computer science, and telecommunications. </p>
+        
+        <p class="h4">
+            Formal definition
+        </p>
+        <p class="mt-2 math">
+            A stochastic process is defined as a sequence of random variables on a common probability space \((\Omega, F, P)\) where \(\Omega \) is the sample space, F is a \(\sigma\)-algebra and P is a probability measure. The random variables indexed by some index set \(T\) (often the time) take values in a space \(S\) which is measurable respect to some \(\sigma\)-algebra
+        </p>
+        <p>
+            So for the given parameters a stochastic process can be written as: 
+        </p>
+        <p class="math">
+            \[
+            \{X(t):t\in T\}
+            \]
+        </p>
+        <p class="lead">
+            Stochastic processes classification:
+        </p>
+
+        <p>
+            A stochastic process can be classified under two main categories:
+            <ul>
+                <li>
+                    <span class="lead">Discrete time stochastic processes</span>
+                    An example can be represented by random walks.
+                </li>
+                <li>
+                    <span class="lead">Continuous time stochastic processes</span>
+                    An example can be represented by brownian motions.
+                </li>
+            </ul>
+        </p>
+
+
+        <p class="h3">
+            Stochastic differential equations
+        </p>
+        <p>
+            A stochastic differential equation is a classical differential equation but it's perturbed by some random noise.
+        </p>
+        <p class="math">\[ dX_t = \mu(t, X_t) \, dt + \sigma(t, X_t) \, dW_t \]</p>
+
+        <p>Here, \(X_t\) is the stochastic process, \(\mu(t, X_t)\) is the drift term, \(\sigma(t, X_t)\) is the diffusion term, \(dt\) represents the differential of time, and \(dW_t\) represents the differential of a standard Wiener process (Brownian motion).</p>
+        <p class="math">
+            For given functions and a brownian motion \(W_t\), the solution to this equation is a function \(X\) that satisfies the following:
+            \[
+            X(T) = \int_{0}^{T} \mu(t, X(t))dt + \int_{0}^{T} \sigma(t, X(t)) dW(t)
+            \]
+        </p>
+
+        <p>
+            More in general, differential equation have common terms like:
+            <ul>
+                <li>
+                    <b class="math">Drift term: \(\mu(t, X_t)\)</b> represents the deterministic part of the change in the process.
+                </li>
+                <li>
+                    <b class="math">Diffusion term: \(\sigma(t, X_t)\)</b> represents the random part of the change.
+                </li>
+            </ul>
+        </p>
+      </div>
+    </div>
+    <section class="bibliography">
+        <h4>Bibliography</h4>
+        <ul>
+          <li><a href="https://www.sciencedirect.com/science/article/abs/pii/B9780080448947013695">Stochastic processes</a></li>
+          <li><a href="https://en.wikipedia.org/wiki/Stochastic_process">Wikipedia page for stochastic processes</a></li>
+          <li><a href="https://www.sciencedirect.com/science/article/pii/B0125126662003692">Stochastic differential equation</a></li>
+          <li><a href="https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/a671d0d2abe626c371fd5850ad670397_MIT18_S096F13_lecnote21.pdf">SDE lecture notes from mit ocw</a></li>
+          <!-- Add more paper titles as needed -->
+        </ul>
+      </section>
+  </div>
+
+  
+
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
