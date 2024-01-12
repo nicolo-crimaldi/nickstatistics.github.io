@@ -909,151 +909,152 @@ class Program
         </pre>
     </div>
     <p>In js:</p>
-    const csvUrl = 'https://github.com/ZioNick1/nickstatistics.github.io/blob/main/datasets/Professional%20Life%20-%20Sheet1.tsv';
+
     
-    fetch(csvUrl)
-    .then(response => response.text())
-    .then(data => {
-        const lines = data.split('\n');
-        const result = [];
-        const headers = lines[0].split('\t');
-
-        const heightIntervals = {
-        "1.50-1.59": { min: 1.60, max: 1.59 },
-        "1.60-1.69": { min: 1.60, max: 1.69 },
-        "1.70-1.79": { min: 1.70, max: 1.79 },
-        "1.80-1.89": { min: 1.80, max: 1.89 },
-        "1.90-1.99": { min: 1.90, max: 1.99 },
-        };
-        
-        joinLines = 0;
-
-        const columnData = {};
-        const distribuzioneCongiunta = {};
-
-        headers.forEach(header => {
-        columnData[header] = {};
-        });
-
-        for (let i = 1; i < lines.length; i++) {
-            const currentLine = lines[i].split(',');
-            const age = currentLine[headers.indexOf("Age")];
-            const sport = currentLine[headers.indexOf("Sports")];
-
-            for (let j = 0; j < headers.length; j++) {
-                const header = headers[j];
-                const cellValue = currentLine[j];
-
-                if (cellValue!='-'){
-                    if (columnData[header][cellValue]) {
-                        columnData[header][cellValue] += 1;
-                    } else {
-                        columnData[header][cellValue] = 1;
-                    }
-                }
-            }
-
-            if (age && sport && age!='-' && sport!='-') {
-                const chiave = `${age}-${sport}`;
-                if (distribuzioneCongiunta[chiave]) {
-                    distribuzioneCongiunta[chiave] += 1;
-                } else {
-                    distribuzioneCongiunta[chiave] = 1;
-                }
-                joinLines += 1;
-            }
-        }
-
-        const heightCounts = {};
-        for (const interval in heightIntervals) {
-            heightCounts[interval] = 0;
-        }
-        
-        for (var chiave in columnData["Height\r"]) {
-            if (columnData["Height\r"].hasOwnProperty(chiave)) {
-                const height = parseFloat(chiave.replace(',', '.'));
-                for (const i in heightIntervals) {
-                    var min = parseFloat(i.split('-')[0]);
-                    var max = parseFloat(i.split('-')[1]);
-                    if (height >= min && height <= max) {
-                        heightCounts[i] += 1;
-                    }
-                }
-                
-            }
-        }
-
-        var tableAge = document.getElementById("tableAge");
-        var tableSport = document.getElementById("tableSport");
-        var tableHeight = document.getElementById("tableHeight");
-        var tableJoin = document.getElementById("tableJOIN");
-
-        for (var chiave in columnData["Age"]) {
-            if (columnData["Age"].hasOwnProperty(chiave)) {
-                var riga = tableAge.insertRow(tableAge.rows.length);
-                var cellaChiave = riga.insertCell(0);
-                var absoluteFrequenceCell = riga.insertCell(1);
-                var relativeFrequenceCell = riga.insertCell(2);
-                var percentageFrequenceCell = riga.insertCell(3);
-                
-
-                cellaChiave.innerHTML = chiave;
-                absoluteFrequenceCell.innerHTML = columnData["Age"][chiave];
-                relativeFrequenceCell.innerHTML = (columnData["Age"][chiave] / lines.length).toFixed(5);
-                percentageFrequenceCell.innerHTML = ((columnData["Age"][chiave] / lines.length)*100).toFixed(5);
-            }
-        }
-
-        for (const interval in heightCounts) {
-            const riga = tableHeight.insertRow(tableHeight.rows.length);
-            const cellaChiave = riga.insertCell(0);
-            const absoluteFrequenceCell = riga.insertCell(1);
-            const relativeFrequenceCell = riga.insertCell(2);
-            const percentageFrequenceCell = riga.insertCell(3);
-
-            cellaChiave.innerHTML = interval;
-            absoluteFrequenceCell.innerHTML = heightCounts[interval];
-            relativeFrequenceCell.innerHTML = (heightCounts[interval] / lines.length).toFixed(5);
-            percentageFrequenceCell.innerHTML = ((heightCounts[interval] / lines.length) * 100).toFixed(5);
-        }
-
-        for (var chiave in columnData["Sports"]) {
-            if (columnData["Sports"].hasOwnProperty(chiave)) {
-                var riga = tableSport.insertRow(tableSport.rows.length);
-                var cellaChiave = riga.insertCell(0);
-                var absoluteFrequenceCell = riga.insertCell(1);
-                var relativeFrequenceCell = riga.insertCell(2);
-                var percentageFrequenceCell = riga.insertCell(3);
-
-                cellaChiave.innerHTML = chiave;
-                absoluteFrequenceCell.innerHTML = columnData["Sports"][chiave];
-                relativeFrequenceCell.innerHTML = (columnData["Sports"][chiave] / lines.length).toFixed(5);
-                percentageFrequenceCell.innerHTML = ((columnData["Sports"][chiave] / lines.length)*100).toFixed(5);
-            }
-        }
-
-        for (var chiave in distribuzioneCongiunta) {
-            if (distribuzioneCongiunta.hasOwnProperty(chiave)) {
-                var riga = tableJoin.insertRow(tableJoin.rows.length);
-                var cellaChiave = riga.insertCell(0);
-                var absoluteFrequenceCell = riga.insertCell(1);
-                var relativeFrequenceCell = riga.insertCell(2);
-                var percentageFrequenceCell = riga.insertCell(3);
-
-                cellaChiave.innerHTML = chiave;
-                absoluteFrequenceCell.innerHTML = distribuzioneCongiunta[chiave];
-                relativeFrequenceCell.innerHTML = (distribuzioneCongiunta[chiave] / joinLines).toFixed(5);
-                percentageFrequenceCell.innerHTML = ((distribuzioneCongiunta[chiave] / joinLines) * 100).toFixed(5);
-            }
-        }
-
-        console.log(columnData);
-        console.log(distribuzioneCongiunta);
-    })
-    .catch(error => console.error('Errore durante il recupero del file CSV:', error));
     <pre>
         <code>
-
+            const csvUrl = 'https://github.com/ZioNick1/nickstatistics.github.io/blob/main/datasets/Professional%20Life%20-%20Sheet1.tsv';
+    
+            fetch(csvUrl)
+            .then(response => response.text())
+            .then(data => {
+                const lines = data.split('\n');
+                const result = [];
+                const headers = lines[0].split('\t');
+        
+                const heightIntervals = {
+                "1.50-1.59": { min: 1.60, max: 1.59 },
+                "1.60-1.69": { min: 1.60, max: 1.69 },
+                "1.70-1.79": { min: 1.70, max: 1.79 },
+                "1.80-1.89": { min: 1.80, max: 1.89 },
+                "1.90-1.99": { min: 1.90, max: 1.99 },
+                };
+                
+                joinLines = 0;
+        
+                const columnData = {};
+                const distribuzioneCongiunta = {};
+        
+                headers.forEach(header => {
+                columnData[header] = {};
+                });
+        
+                for (let i = 1; i < lines.length; i++) {
+                    const currentLine = lines[i].split(',');
+                    const age = currentLine[headers.indexOf("Age")];
+                    const sport = currentLine[headers.indexOf("Sports")];
+        
+                    for (let j = 0; j < headers.length; j++) {
+                        const header = headers[j];
+                        const cellValue = currentLine[j];
+        
+                        if (cellValue!='-'){
+                            if (columnData[header][cellValue]) {
+                                columnData[header][cellValue] += 1;
+                            } else {
+                                columnData[header][cellValue] = 1;
+                            }
+                        }
+                    }
+        
+                    if (age && sport && age!='-' && sport!='-') {
+                        const chiave = `${age}-${sport}`;
+                        if (distribuzioneCongiunta[chiave]) {
+                            distribuzioneCongiunta[chiave] += 1;
+                        } else {
+                            distribuzioneCongiunta[chiave] = 1;
+                        }
+                        joinLines += 1;
+                    }
+                }
+        
+                const heightCounts = {};
+                for (const interval in heightIntervals) {
+                    heightCounts[interval] = 0;
+                }
+                
+                for (var chiave in columnData["Height\r"]) {
+                    if (columnData["Height\r"].hasOwnProperty(chiave)) {
+                        const height = parseFloat(chiave.replace(',', '.'));
+                        for (const i in heightIntervals) {
+                            var min = parseFloat(i.split('-')[0]);
+                            var max = parseFloat(i.split('-')[1]);
+                            if (height >= min && height <= max) {
+                                heightCounts[i] += 1;
+                            }
+                        }
+                        
+                    }
+                }
+        
+                var tableAge = document.getElementById("tableAge");
+                var tableSport = document.getElementById("tableSport");
+                var tableHeight = document.getElementById("tableHeight");
+                var tableJoin = document.getElementById("tableJOIN");
+        
+                for (var chiave in columnData["Age"]) {
+                    if (columnData["Age"].hasOwnProperty(chiave)) {
+                        var riga = tableAge.insertRow(tableAge.rows.length);
+                        var cellaChiave = riga.insertCell(0);
+                        var absoluteFrequenceCell = riga.insertCell(1);
+                        var relativeFrequenceCell = riga.insertCell(2);
+                        var percentageFrequenceCell = riga.insertCell(3);
+                        
+        
+                        cellaChiave.innerHTML = chiave;
+                        absoluteFrequenceCell.innerHTML = columnData["Age"][chiave];
+                        relativeFrequenceCell.innerHTML = (columnData["Age"][chiave] / lines.length).toFixed(5);
+                        percentageFrequenceCell.innerHTML = ((columnData["Age"][chiave] / lines.length)*100).toFixed(5);
+                    }
+                }
+        
+                for (const interval in heightCounts) {
+                    const riga = tableHeight.insertRow(tableHeight.rows.length);
+                    const cellaChiave = riga.insertCell(0);
+                    const absoluteFrequenceCell = riga.insertCell(1);
+                    const relativeFrequenceCell = riga.insertCell(2);
+                    const percentageFrequenceCell = riga.insertCell(3);
+        
+                    cellaChiave.innerHTML = interval;
+                    absoluteFrequenceCell.innerHTML = heightCounts[interval];
+                    relativeFrequenceCell.innerHTML = (heightCounts[interval] / lines.length).toFixed(5);
+                    percentageFrequenceCell.innerHTML = ((heightCounts[interval] / lines.length) * 100).toFixed(5);
+                }
+        
+                for (var chiave in columnData["Sports"]) {
+                    if (columnData["Sports"].hasOwnProperty(chiave)) {
+                        var riga = tableSport.insertRow(tableSport.rows.length);
+                        var cellaChiave = riga.insertCell(0);
+                        var absoluteFrequenceCell = riga.insertCell(1);
+                        var relativeFrequenceCell = riga.insertCell(2);
+                        var percentageFrequenceCell = riga.insertCell(3);
+        
+                        cellaChiave.innerHTML = chiave;
+                        absoluteFrequenceCell.innerHTML = columnData["Sports"][chiave];
+                        relativeFrequenceCell.innerHTML = (columnData["Sports"][chiave] / lines.length).toFixed(5);
+                        percentageFrequenceCell.innerHTML = ((columnData["Sports"][chiave] / lines.length)*100).toFixed(5);
+                    }
+                }
+        
+                for (var chiave in distribuzioneCongiunta) {
+                    if (distribuzioneCongiunta.hasOwnProperty(chiave)) {
+                        var riga = tableJoin.insertRow(tableJoin.rows.length);
+                        var cellaChiave = riga.insertCell(0);
+                        var absoluteFrequenceCell = riga.insertCell(1);
+                        var relativeFrequenceCell = riga.insertCell(2);
+                        var percentageFrequenceCell = riga.insertCell(3);
+        
+                        cellaChiave.innerHTML = chiave;
+                        absoluteFrequenceCell.innerHTML = distribuzioneCongiunta[chiave];
+                        relativeFrequenceCell.innerHTML = (distribuzioneCongiunta[chiave] / joinLines).toFixed(5);
+                        percentageFrequenceCell.innerHTML = ((distribuzioneCongiunta[chiave] / joinLines) * 100).toFixed(5);
+                    }
+                }
+        
+                console.log(columnData);
+                console.log(distribuzioneCongiunta);
+            })
+            .catch(error => console.error('Errore durante il recupero del file CSV:', error));
         </code>
     </pre>
 </body>
