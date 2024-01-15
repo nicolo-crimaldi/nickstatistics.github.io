@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Online Algorithms</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- MathJax script -->
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="mb-4">Online Algorithms</h1>
+
+    <p>
+        Online algorithms are algorithms that process their input piece by piece in a serial fashion,
+        without having the entire input available from the start. These algorithms are particularly useful
+        in situations where the input is too large to fit into memory or even when tha input is arriving as a stream of serial data because we need to optimize
+        the calculations to avoid of recalculating the data on the whole input every time a new value is added.
+    </p>
+
+    <p class="h2">
+        Formalization
+    </p>
+    <p>
+        An online algorithm receives in input a sequence of requests \(\sigma = \sigma(1), \sigma(2), ..., \sigma(m)\) that needs to be satisfied in order of arrival.
+    </p>
+
+    <h2>Competitive Analysis</h2>
+
+    <p>
+        One common way to analyze online algorithms is through competitive analysis. Competitive analysis
+        compares the performance of an online algorithm to that of an optimal offline algorithm that has
+        complete knowledge of the entire input in advance. The goal is to quantify how well the online
+        algorithm performs relative to the optimal offline algorithm.
+    </p>
+    <p>
+        Given a sequence \(\sigma\), let's define \(ALG(\sigma)\) and \(OPT(\sigma)\) respectively as the cost of the operations made by the online algorithm and the cost of the operations made
+        by an ipothetical offline optimal algorithm that performs the same task. we will say that \(ALG(\sigma)\) is c-competitive if 
+        \[
+        \exists b: ALG(\sigma) \leq c * OPT(\sigma) + b \forall \sigma 
+        \]
+        with b independent from \(\sigma\).
+    </p>
+
+    <h2>Mathematical Formulation</h2>
+
+    <p>
+        The competitive ratio (CR) is often used to measure the performance of online algorithms. It is defined as
+        the worst-case ratio between the cost of the online algorithm and the cost of the optimal offline algorithm:
+    </p>
+
+    <p class="text-center">
+        \( CR = \max\left(\frac{{\text{{cost of online algorithm}}}}{{\text{{cost of optimal offline algorithm}}}}, \frac{{\text{{cost of optimal offline algorithm}}}}{{\text{{cost of online algorithm}}}}\right) \)
+    </p>
+
+    <p>
+        The goal is to design online algorithms with competitive ratios as close to 1 as possible, indicating
+        near-optimal performance in comparison to the offline counterpart.
+    </p>
+
+    <p class="h2">
+        Data modeling
+    </p>
+    <p class="lead">
+        Data stream model
+    </p>
+    <p>
+        In the data stream model, some or all of the input is represented as a finite sequence of integers (from some finite domain) which is generally not available for random access, but instead arrives one at a time in a "stream". If the stream has length n and the domain has size m, algorithms are generally constrained to use space that is logarithmic in m and n. They can generally make only some small constant number of passes over the stream, sometimes just one.
+    </p>
+    <p class="lead">
+        Cash register models
+    </p>
+    <p>
+        In this model, every input that arrives over a particular domain (time for example) is impaired with that specific domain value, so we have a vector
+        \(\textbf{a} = (a_1, ..., a_n)\) initialized to <b>0</b> and every update is in the form of \(<i, c>\) where the element in the position of \(a_i\) is incremented of some value \(c\).
+    </p>
+    <p class="h2">
+        Famous online algorithms
+    </p>
+    <p>
+        The most famous cases of online alogrithms includes
+        <ul>
+            <li>Insertion sort</li>
+            <li>Page replacement algorithms</li>
+            <li>Standard deviation</li>
+            <li>Algorithms for calculating mean, average, median etc...</li>
+        </ul>
+    </p>
+
+    <p class="h2">
+        Java class with standard deviation (implementation of online algorithm)
+    </p>
+    <p>
+        The Standard Deviation is a measurement of the dispersion of a set of data points. A low value indicates that the set of data points tend to be close to the mean (the expected value). In simple terms the Standard Deviation of a set of data points is the square root of variance. Which then raises the question of how to find the variance on a sequence of data where the number of data points and their values is unknown. This is where the ‘online’ variance work done by B. P. Welford is relevant. There are two ways of finding the variance depending on if calculating an estimate of the Standard Deviation for a given population from a ‘sample’ data set or calculating using the complete ‘population’ data set. The code example below shows methods for both ways.
+    </p>
+    <p>
+        The code below is a basic implementation of an online version algorithm to calculate the standard deviation in Java. It updates the values using static variables 
+        as they are fed to the program from a sequence one at time.
+    </p>
+    <pre>
+        <code class="language-java">
+            public class StandardDeviation {
+
+                private static int count = 0;
+                private static double mean = 0.0;
+                private static double sum = 0.0;
+        
+                public static void setValues(double data){
+                    ++count;
+                    double delta = mean + (data - mean) / count;
+                    sum += (data - mean) * (data - delta);
+                    mean = delta;
+                }
+        
+                private static Double getVariancePopulation(){
+                    // for 'population' standard deviation calculation
+                    return sum / (count);
+                }
+        
+                private static Double getVarianceSample(){
+                    // for 'sample' standard deviation calculation
+                    return sum / (count - 1);
+                }
+        
+                public static Double getSDPopulation(){
+                    return count > 0 ? Math.sqrt(getVariancePopulation()) : 0.0;
+                }
+        
+                public static Double getSDSample(){
+                    return count > 0 ? Math.sqrt(getVarianceSample()) : 0.0;
+                }
+            }
+        </code>
+    </pre>
+    <p class="lead">
+        Competitive analysis
+    </p>
+    <p>
+        Let's analyze the cost of this algorithm: Let's stay under the assumption that the method <code>setValues(double data)</code> has a cost of O(n) because it
+        performs just basic operations, so we have a linear cost. The offline counterpart is basically the same but the values arrive all at once. The drawback of the offline
+        version is that if a new value arrives, we need to reperform every operation. This doesn't happen in this case. So we can say that this algorithm is 1-competitive based
+        on the definitions that we have seen earlier in this paper.
+    </p>
+
+    <p class="h2">
+        Count-Min sketch in Python
+    </p>
+    <p class="lead">
+        Introduction
+    </p>
+    <p>
+        A count-min sketch is a data structure that consists of an array of counters, usually with a fixed size. The idea is to use one or more hash functions to map each item in the data stream to a counter in the array, and increment that counter by one. Then, to estimate the frequency of an item, we simply hash it and return the value of the corresponding counter.
+    </p>
+    <p class="lead">
+        Generating and applying hash functions
+    </p>
+    <p>
+        To generate hash functions for the items, we can use random numbers as parameters. A common way to define a hash function is to use the form h(x) = (a * x + b) % p, where x is the item to be hashed, p is a prime number larger than the range of x, a and b are random numbers between 2 and p-1, and % is the modulo operator.
+
+        To apply hash functions for strings, we can first convert them to numbers using the built-in hash() function in Python, and then apply the hash function h(x) = (a * x + b) % p
+    </p>
+    <pre>
+        <code class="language-python">
+# Get a random triple (p, a, b) where p is prime and a,b are numbers betweeen 2 and p-1
+
+def get_random_hash_function():
+
+    n = random.getrandbits(64)
+
+    if n < 0: 
+
+        n = -n 
+
+    if n % 2 == 0:
+
+        n = n + 1
+
+    while not isPrime(n, 20):
+
+        n = n + 1
+
+    a = random.randint(2, n-1)
+
+    b = random.randint(2, n-1)
+
+    return (n, a, b)
+
+# hash function fora number
+
+def hashfun(hfun_rep, num):
+
+    (p, a, b) = hfun_rep
+
+    return (a * num + b) % p
+
+# hash function for a string.
+
+def hash_string(hfun_rep, hstr):
+
+    n = hash(hstr)
+
+    return hashfun(hfun_rep, n)    
+        </code>
+    </pre>
+
+    <p class="lead">
+        Generating and updating an array of counters
+    </p>
+    <p>
+        To create and update an array of counters for each hash function, we can use a list of integers and a class that encapsulates the hash function and the counters. The class has the following attributes and methods:
+        <ul>
+            <li>
+                The attribute self.m is the number of counters in the array.
+            </li>
+            <li>
+                The attribute self.hash_fun_rep is a triple (p, a, b) that defines a hash function for the items.
+            </li>
+            <li>
+                The attribute self.counters is a list of integers that stores the counts of the hashed items.
+            </li>
+            <li>
+                The method init(self, num_counters) is the constructor that initializes the attributes with the given number of counters and a random hash function.
+            </li>
+            <li>
+                The method increment(self, word) takes a word and increments its count in the array by hashing it and adding one to the corresponding counter in the list.
+            </li>
+            <li>
+                The method approximateCount(self, word) takes a word and returns its count in the array by hashing it and returning the value of the corresponding counter in the list.
+            </li>
+        </ul>
+    </p>
+    <pre>
+        <code class="language-python">
+    class CountMinSketch:
+
+    # Initialize with `num_counters`
+
+    def __init__ (self, num_counters):
+
+        self.m = num_counters
+
+        self.hash_fun_rep = get_random_hash_function()
+
+        self.counters = [0]*self.m
+
+    
+
+    # function: increment 
+
+    # given a word, increment its count in the countmin sketch
+
+    def increment(self, word):
+
+        #
+
+        self.counters[hash_string(self.hash_fun_rep, word)%self.m] = self.counters[hash_string(self.hash_fun_rep, word)%self.m] +1
+
+        #return None
+
+        
+
+    # function: approximateCount
+
+    # Given a word, get its approximate count
+
+    def approximateCount(self, word):   
+
+        return self.counters[hash_string(self.hash_fun_rep, word)%self.m]
+        </code>
+    </pre>
+    <p>
+        One potential problem with the usual min estimator for count–min sketches is that they are biased estimators of the true frequency of events: they may overestimate, but never underestimate the true count in a point query. Furthermore, while the min estimator works well when the distribution is highly skewed, other sketches such as the Count sketch based on means are more accurate when the distribution is not sufficiently skewed. Several variations on the sketch have been proposed to reduce error and reduce or eliminate bias.
+    </p>
+
+    <p class="h6">
+        bibliography:
+        <ul>
+            <li><a href="https://www14.in.tum.de/personen/albers/papers/inter.pdf">Online Algorithms, Susanne Albers</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Online_algorithm">Wikipedia page for online algorithms</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Streaming_algorithm">Wikipedia page for streaming algorithms</a></li>
+            <li>
+                <a href="https://www.vldb.org/conf/2001/P079.pdf">
+                    Surfing Wavelets on Streams: One-Pass Summaries for
+                    Approximate Aggregate Queries
+                </a>
+            </li>
+            <li><a href="https://en.wikipedia.org/wiki/Standard_deviation">Wikipedia page for standard deviation</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch">Wikipedia page for Count-Min sketch data structure</a></li>
+        </ul>
+    </p>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<!-- and it's easy to individually load additional languages -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+
+<script>hljs.highlightAll();</script>
+
+</body>
+</html>
