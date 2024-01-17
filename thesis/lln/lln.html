@@ -68,6 +68,22 @@
 
             <p>These laws are fundamental in probability theory and statistics, providing the theoretical basis for the reliability of sample means as estimators of population means.</p>
         </div>
+        <div>
+            <h2>Simulations</h2>
+            <p>
+                We can simulate babies’ weights with independent normal random variables, mean 3 kg and standard
+                deviation 0.5 kg. The following R commands perform this simulation and computes a running average of the heights.
+            </p>
+            <pre>
+                <code>
+                    > n<-c(1:100)
+                    > x<-rnorm(100,3,0.5)
+                    > s<-cumsum(x)
+                    > plot(s/n,xlab="n",ylim=c(2,4),type="l")
+                </code>
+            </pre>
+            <img src="../images/lln.png" alt="">
+        </div>
     </div>
 
     <!-- Include Bootstrap JS -->
